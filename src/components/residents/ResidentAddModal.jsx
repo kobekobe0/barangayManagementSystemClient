@@ -21,7 +21,8 @@ const ResidentAddModal = ({onClose}) => {
             apartment: '',
             householdNumber: '',
             sitio: ''
-        }
+        },
+        sex: '',
     })
 
     const prepareData = (data) => {
@@ -89,9 +90,33 @@ const ResidentAddModal = ({onClose}) => {
             toast.error('Invalid date format');
             return;
         }
+
+        //check date format, should be yyyy-mm-dd, month should be 01-12, day should be 01-31
+        const dateParts = resident.dateOfBirth.split('-');
+        if (dateParts.length !== 3) {
+            toast.dismiss();
+            toast.error('Invalid date format');
+            return;
+        }
+        if (dateParts[0].length !== 4 || dateParts[1].length !== 2 || dateParts[2].length !== 2) {
+            toast.dismiss();
+            toast.error('Invalid date format');
+            return;
+        }
+        if (parseInt(dateParts[1]) < 1 || parseInt(dateParts[1]) > 12) {
+            toast.dismiss();
+            toast.error('Invalid month');
+            return;
+        }
+
+        if (parseInt(dateParts[2]) < 1 || parseInt(dateParts[2]) > 31) {
+            toast.dismiss();
+            toast.error('Invalid day');
+            return;
+        }
     
         // Prepare data for submission
-        const dataToSubmit = { ...resident };
+        let dataToSubmit = { ...resident };
         prepareData(dataToSubmit);
     
         try {
@@ -138,7 +163,7 @@ const ResidentAddModal = ({onClose}) => {
                         </div>
                         <div className="mt-4 flex gap-2 items-center w-full">
                             <div className="flex flex-col">
-                                <label className="text-sm">Birthdate <span className="text-xs">(yyyy-dd-mm)</span></label>
+                                <label className="text-sm">Birthdate <span className="text-xs">(yyyy-mm-dd)</span></label>
                                 <input type="text" className="p-2 border border-gray-300 rounded-sm w-full mb-4" value={resident.dateOfBirth} onChange={e=>handleDateChange(e.target.value)} maxLength={8}/>
                             </div>
                             <div className="flex flex-col">
@@ -148,6 +173,13 @@ const ResidentAddModal = ({onClose}) => {
                             <div className="flex flex-col">
                                 <label className="text-sm">Yrs of Residency</label>
                                 <input type="number" className="p-2 border border-gray-300 rounded-sm w-full mb-4" value={resident.yrsOfResidency} onChange={e=>handleChange('yrsOfResidency', e.target.value)}/>
+                            </div>
+                            <div className="flex flex-col">
+                                <label className="text-sm">Gender</label>
+                                <select className="p-2 border border-gray-300 rounded-sm w-full mb-4" value={resident.sex} onChange={e=>handleChange('sex', e.target.value)}>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                </select>
                             </div>
                         </div>
                         <div className="mt-4 flex gap-2 items-center">
