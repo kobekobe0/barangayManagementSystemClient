@@ -16,6 +16,7 @@ import ReceiptItem from './pages/ReceiptItem'
 import Cedula from './pages/Cedula'
 import Residents from './pages/Residents'
 import ResidentItem from './pages/ResidentItem'
+import { Toaster } from 'react-hot-toast'
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: 'residents/:id',
         element: <ResidentItem />
+      },
+      {
+        path: 'forms',
+        element: <Census />
       }
     ]
   },
@@ -76,5 +81,6 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <RouterProvider router={router}/>
+    <Toaster position='top-right'/>
   </React.StrictMode>,
 )

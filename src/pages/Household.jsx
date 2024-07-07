@@ -262,7 +262,7 @@ const Household = () => {
                     </div>
                 </div>
                 <div className="mt-4">
-                    <h3 className="font-semibold text-sm">Address</h3>
+                    <h3 className="font-semibold text-sm bg-blue-500 w-fit p-2 text-white">Address</h3>
                     <div className="flex gap-4 mt-2">
                         <div className="flex flex-col">
                             <label className="text-xs" htmlFor="street">Street</label>
@@ -282,16 +282,17 @@ const Household = () => {
                         </div>
                     </div>
                 </div>
+                <hr className="my-4 bg-gray-300 h-[1.5px]"/>
                 <div className="mt-4">
-                    <h3 className="font-semibold text-sm">Head</h3>
+                    <h3 className="font-semibold text-sm bg-green-500 w-fit p-2 text-white">Head</h3>
                     <CensusForm resident={household.head} edit={edit} temp={temp}/>
                 </div>
-
+                <hr className="my-4 bg-gray-300 h-[2px]"/>
                 <div className="mt-4">
                     {
                         familiesData.map((family, index) => (
                             <div key={index} className="mt-4">
-                                <h3 className="font-semibold text-sm">Family {index + 1}</h3>
+                                <h3 className="font-semibold text-sm bg-red-500 w-fit p-2 text-white">Family {index + 1}</h3>
                                 {
                                     family.familyMembers.map((member, memberIndex) => (
                                         <div key={member._id} className={`${memberIndex % 2 === 0 ? 'bg-gray-200': 'white'} p-2 hover:bg-red-300 transition-all`} onContextMenu={(e) => {

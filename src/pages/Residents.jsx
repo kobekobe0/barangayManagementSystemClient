@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { useState, useEffect } from "react"
+import ResidentAddModal from "../components/residents/ResidentAddModal"
 
 const residentsdata = [
     {
@@ -68,6 +69,7 @@ const ResidentCard = ({resident}) => {
 
 const Residents = () => {
     const [residents, setResidents] = useState(residentsdata)
+    const [addModal, setAddModal] = useState(false)
     useEffect(() => {
         console.log(residents)
     },[residents])
@@ -87,6 +89,11 @@ const Residents = () => {
                     ))
                 }
             </div>
+            {
+                addModal && (
+                    <ResidentAddModal onClose={()=>setAddModal(false)}/>
+                )
+            }
         </div>
     )
 }

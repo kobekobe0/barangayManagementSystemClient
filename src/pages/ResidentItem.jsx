@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import ResidentFormRequest from "../components/ResidentFormRequest";
 import ResidentInfo from "../components/ResidentInfo";
+import ResidentAddModal from "../components/residents/ResidentAddModal";
 
 const resident = {
     name: {
@@ -120,6 +121,7 @@ const ResidentItem = () => {
                     activeTab === 'info' ? <ResidentInfo /> : null
                 }
             </div>
+
         </div>
     )
 }
