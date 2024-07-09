@@ -158,7 +158,14 @@ const ResidentAddModal = ({onClose}) => {
                             </div>
                             <div className="flex flex-col">
                                 <label className="text-sm">Suffix</label>
-                                <input type="text" className="p-2 border border-gray-300 rounded-sm w-full mb-4" value={resident?.name.suffix} onChange={e => handleChange('name.suffix', e.target.value)}/>
+                                <select  onChange={e => handleChange('name.suffix', e.target.value)}  className="p-2 border border-gray-300 rounded-sm w-full mb-4" name="name.suffix" value={resident?.name?.suffix || ''}>
+                                    <option value="">None</option>
+                                    <option value="JR">Jr</option>
+                                    <option value="SR">Sr</option>
+                                    <option value="II">II</option>
+                                    <option value="III">III</option>
+                                    <option value="IV">IV</option>
+                                </select>
                             </div>
                         </div>
                         <div className="mt-4 flex gap-2 items-center w-full">

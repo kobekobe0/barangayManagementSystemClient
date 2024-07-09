@@ -184,7 +184,7 @@ const ResidentItem = () => {
                         </div>
                         <div className="flex flex-col justify-between">
                             <p className="text-md text-gray-500">Date of Birth</p>
-                            <p className="text-md font-semibold">{new Date(resident?.dateOfBirth).toLocaleDateString()}</p>
+                            <p className="text-md font-semibold">{new Date(resident?.dateOfBirth).toLocaleDateString('en-us', {year: 'numeric', month:'long', day:'numeric'})}</p>
                         </div>
                         <div className="flex flex-col justify-between">
                             <p className="text-md text-gray-500">Address</p>

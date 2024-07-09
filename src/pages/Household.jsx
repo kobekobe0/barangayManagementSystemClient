@@ -1,7 +1,10 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import CensusForm from "../components/CensusForm";
 import ConfirmationModal from "../components/ConfirmationModal";
+import axios from "axios";
+import toast from "react-hot-toast";
+import API_URL from "../constants/api.js";
 
 const household = 
     {
@@ -138,9 +141,59 @@ const families = [
 ]
 
 const Household = () => {
+    const {householdId} = useParams()
     const [edit, setEdit] = useState(false)
     const [temp, setTemp] = useState('01/21/1990') //TODO
-    const [familiesData, setFamiliesData] = useState([...families])
+    
+    const [household, setHousehold] = useState(null)
+    const [families, setFamilies] = useState([])
+    const [members, setMembers] = useState([])
+
+    const fetchHousehold = async () => {
+        try {
+            const {data} = await axios.get(`${API_URL}census/household/${householdId}`)
+            console.log(data.data)
+
+            // split head.dateOfBirth to yyyy-mm-dd
+            const head = {
+                ...data.data.head,
+                dateOfBirth: data.data.head.dateOfBirth.split('T')[0]
+            }
+            setHousehold({...data.data, head})
+        } catch (error) {
+            console.error(error.message)
+        }
+    }
+
+    const fetchFamilies = async () => {
+        try {
+            const { data } = await axios.get(`${API_URL}census/family/household/${householdId}`);
+    
+            const newFamilies = data.data.map(family => ({
+                _id: family._id,
+                members: family.members.map(member => member._id)
+            }));
+    
+            setFamilies([...newFamilies]);
+    
+            const newMembers = data.data.flatMap(family =>
+                family.members.map(member => ({
+                    ...member,
+                    dateOfBirth: member.dateOfBirth ? member.dateOfBirth.split('T')[0] : '' // Extract date part only
+                }))
+            );
+    
+            setMembers([...newMembers]);
+    
+        } catch (error) {
+            console.error(error.message);
+        }
+    };    
+
+    useEffect(() => {
+        console.log(families)
+        console.log(members)
+    }, [families, members])
 
     const [modal, setModal] = useState({
         title: '',
@@ -151,36 +204,29 @@ const Household = () => {
         open: false
     })
 
-    const handleAddFamily = () => {
-        setFamiliesData([...familiesData, {
-            id: familiesData.length + 1,
-            familyMembers: [
-                {
-                    name: {
-                        first: '',
-                        last: '',
-                        middle: '',
-                        suffix: ''
-                    },
-                    dateOfBirth: '',
-                    sex: '',
-                    civilStatus: '',
-                    occupation: '',
-                    educationalAttainment: '',
-                    religion: '',
-                    sector: null,
-                    votingStatus: true,
-                    pregnant: false,
-                    p4: true,
-                    registeredBusiness: true,
-                }]
+    const handleAddFamily = async () => {
+        setFamilies([...families, {
+            _id: `tempID-${Math.floor(Math.random() * 1000000)}`,
+            members: []
         }])
     }
 
-    const handleAddFamilyMember = (index) => {
-        const newFamiliesData = [...familiesData]; // Create a copy of familiesData
-        const newFamily = newFamiliesData[index];
-        newFamily.familyMembers.push({
+    const handleAddFamilyMember = (familyID) => {
+        const tempID = `tempID-${Math.floor(Math.random() * 1000000)}`;
+
+        // push tempID to the family.members array based on the familyID
+        setFamilies(families.map(family => {
+            if (family._id === familyID) {
+                return {
+                    ...family,
+                    members: [...family.members, tempID]
+                }
+            }
+            return family;
+        }));
+    
+        // Add a new member to the members array
+        setMembers([...members, {
             name: {
                 first: '',
                 last: '',
@@ -195,31 +241,23 @@ const Household = () => {
             religion: '',
             sector: null,
             votingStatus: true,
-            pregnant: false,
-            p4: true,
-            registeredBusiness: true,
-            _id: Math.floor(Math.random() * 15631216)
-        });
-    
-        setFamiliesData(newFamiliesData); // Update the state with the new data
+            p4: false,
+            registered: false,
+            familyPlanning: true,
+            _id: tempID
+        }]);
     }
 
-    const handleRemoveFamily = (index) => {
-        const newFamiliesData = [...familiesData]; // Create a copy of familiesData
-        newFamiliesData.splice(index, 1); // Remove the family at the specified index
-    
-        setFamiliesData(newFamiliesData); // Update the state with the new data
+    const handleRemoveFamily = (familyID) => {
+        // Remove family members based on familyID
+        setMembers(members.filter(member => !families.find(family => family._id === familyID).members.includes(member._id)));
+
+        // Remove family based on familyID
+        setFamilies(families.filter(family => family._id !== familyID));
     }
 
-    const handleRemoveFamilyMember = (familyIndex, memberIndex, e) => {
+    const handleRemoveFamilyMember = (memberID) => {
         if(!edit) return;
-        e.preventDefault();
-
-        const newFamiliesData = [...familiesData];
-        const familyToRemoveMember = newFamiliesData[familyIndex];
-        familyToRemoveMember.familyMembers.splice(memberIndex, 1);
-        console.log(familyToRemoveMember.familyMembers)
-
         setModal({
             open: false,
             title: '',
@@ -228,10 +266,55 @@ const Household = () => {
             onConfirm: null,
             onCancel: null
         })
+        // Remove member based on memberID
+        setMembers(members.filter(member => member._id !== memberID));
+
+        // Remove member from family members array
+        setFamilies(families.map(family => {
+            if (family._id === familyID) {
+                return {
+                    ...family,
+                    members: family.members.filter(member => member !== memberID)
+                }
+            }
+            return family;
+        }));
+
     };
+
+    const handleMemberValueChange = useCallback((memberID, keyPath, value) => {
+        setMembers(members => members.map(member => {
+            if (member._id === memberID) {
+                let updatedMember = { ...member };
+    
+                // Check if the keyPath is 'dateOfBirth' and value is 8 characters long
+                if (keyPath === 'dateOfBirth' && value.length === 8) {
+                    // Format the date as 'YYYY-MM-DD'
+                    const formattedDate = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
+                    updatedMember[keyPath] = formattedDate;
+                } else {
+                    // For other fields, update normally
+                    const keys = keyPath.split('.');
+                    let currentLevel = updatedMember;
+    
+                    for (let i = 0; i < keys.length - 1; i++) {
+                        currentLevel = currentLevel[keys[i]];
+                    }
+    
+                    currentLevel[keys[keys.length - 1]] = value;
+                }
+    
+                return updatedMember;
+            }
+            return member;
+        }));
+    }, []);
+    
+    const memoizedMembers = useMemo(() => members, [members]);
 
     const openModal = (title, message, color, onConfirm, onCancel, e) => {
         e.preventDefault();
+        if(!edit) return;
         setModal({
             title,
             message,
@@ -243,15 +326,17 @@ const Household = () => {
     }
 
     useEffect(() => {
-        console.log(familiesData);
-    }, [familiesData]);
+        fetchHousehold()
+        fetchFamilies()
+    }, [])
 
     return (
         <div className='shadow-lg p-8'>
             <div>
                 <div className='flex justify-between items-center'>
                     <h2 className='font-semibold text-lg'>Household</h2>
-                    <div>
+                    <div className="flex items-center gap-2">
+                        <button className='bg-blue-500 text-white rounded-sm px-4 py-1'>Print</button>
                         {
                             edit ? (
                                 <button className='bg-blue-500 text-white rounded-sm px-4 py-1' onClick={() => setEdit(false)}>Save</button>
@@ -266,53 +351,66 @@ const Household = () => {
                     <div className="flex gap-4 mt-2">
                         <div className="flex flex-col">
                             <label className="text-xs" htmlFor="street">Street</label>
-                            <input type="text" name="street" className="border-b border px-2 py-1" defaultValue={household.address.street} disabled={!edit}/>
+                            <input type="text" name="street" className="border-b border px-2 py-1" defaultValue={household?.address?.streetName} disabled={true}/>
                         </div>
                         <div className="flex flex-col">
                             <label className="text-xs" htmlFor="houseNumber">House Number</label>
-                            <input type="text" name="houseNumber" className="border-b border px-2 py-1" defaultValue={household.address.householdNuber} disabled={!edit}/>
+                            <input type="text" name="houseNumber" className="border-b border px-2 py-1" defaultValue={household?.address?.householdNumber} disabled={true}/>
                         </div>
                         <div className="flex flex-col">
                             <label className="text-xs" htmlFor="apartment">Apartment</label>
-                            <input type="text" name="apartment" className="border-b border px-2 py-1" defaultValue={household.address.apartment} disabled={!edit}/>
+                            <input type="text" name="apartment" className="border-b border px-2 py-1" defaultValue={household?.address?.apartment} disabled={true}/>
                         </div>
                         <div className="flex flex-col">
                             <label className="text-xs" htmlFor="sitio">Sitio</label>
-                            <input type="text" name="sitio" className="border-b border px-2 py-1" defaultValue={household.address.sitio} disabled={!edit}/>
+                            <input type="text" name="sitio" className="border-b border px-2 py-1" defaultValue={household?.address?.sitio} disabled={true}/>
                         </div>
+                        {
+                            !household?.isUnique && (
+                                <div className="flex flex-col justify-around">
+                                    <p className="text-xs font-semibold" htmlFor="householdNumber">Special Address <span className="text-xs font-normal text-gray-700">(This is auto generated if household address is not unique)</span></p>
+                                    <input type="text" name="sitio" className="border-b border px-2 py-1 font-bold" defaultValue={household?.identifier} disabled={true}/>
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
                 <hr className="my-4 bg-gray-300 h-[1.5px]"/>
                 <div className="mt-4">
                     <h3 className="font-semibold text-sm bg-green-500 w-fit p-2 text-white">Head</h3>
-                    <CensusForm resident={household.head} edit={edit} temp={temp}/>
+                    <CensusForm resident={household?.head} edit={edit} temp={temp}/>
                 </div>
                 <hr className="my-4 bg-gray-300 h-[2px]"/>
                 <div className="mt-4">
                     {
-                        familiesData.map((family, index) => (
-                            <div key={index} className="mt-4">
-                                <h3 className="font-semibold text-sm bg-red-500 w-fit p-2 text-white">Family {index + 1}</h3>
-                                {
-                                    family.familyMembers.map((member, memberIndex) => (
-                                        <div key={member._id} className={`${memberIndex % 2 === 0 ? 'bg-gray-200': 'white'} p-2 hover:bg-red-300 transition-all`} onContextMenu={(e) => {
+                        families.map((family, familyIndex) => (
+                            <div key={family._id} className="mt-4">
+                                <div className="flex justify-between items-center my-2">
+                                    <h3 className="font-semibold text-sm bg-red-500 w-fit px-2 py-1 text-white">Family {familyIndex + 1}</h3>
+                                    <div className="flex items-center gap-4">
+                                        <button onClick={() => handleRemoveFamily(family._id)} className="border border-red-400 text-red-400 px-2 rounded-md hover:bg-red-400 hover:text-white py-1 text-sm">Remove family</button>
+                                        <button onClick={() => handleAddFamilyMember(family._id)} className="bg-blue-500 px-2 rounded-md text-white py-1 text-sm">+ Add Family Member</button>
+                                    </div>
+                                </div>
+                                {family.members.map((memberId, memberIndex) => {
+                                    const member = memoizedMembers.find(member => member._id === memberId);
+                                    if (!member) return null;
+
+                                    return (
+                                        <div key={member._id} className={`${memberIndex % 2 === 0 ? 'bg-gray-200' : 'white'} p-2 hover:bg-red-300 transition-all`} onContextMenu={(e) => {
                                             openModal(
                                                 'Remove Family Member',
                                                 'Are you sure you want to remove this family member?',
                                                 'bg-red-500',
-                                                () => handleRemoveFamilyMember(index, memberIndex, e),
-                                                () => {setModal({open: false})},
+                                                () => handleRemoveFamilyMember(familyIndex, memberIndex, e),
+                                                () => { setModal({ open: false }) },
                                                 e
-                                            )
+                                            );
                                         }}>
-                                            <CensusForm key={memberIndex} resident={member} edit={edit} temp={temp}/>
+                                            <CensusForm key={member._id} resident={member} onMemberValueChange={handleMemberValueChange} edit={edit} />
                                         </div>
-                                    ))
-                                }
-                                <div className="flex justify-end gap-4">
-                                    <button onClick={() => handleRemoveFamily(index)} className="bg-red-400 p-2 rounded-md text-white mt-4">Remove family</button>
-                                    <button onClick={() => handleAddFamilyMember(index)} className="bg-blue-500 p-2 rounded-md text-white mt-4">+ Add Family Member</button>
-                                </div>
+                                    );
+                                })}
                             </div>
                         ))
                     }

@@ -231,7 +231,14 @@ const ResidentInfo = ({residentData}) => {
                     </div>
                     <div className="flex flex-col w-1/12">
                         <label className="text-sm">Suffix</label>
-                        <input type="text" className="border py-2 px-1 font-semibold" value={resident?.name?.suffix} onChange={e=>handleChange('name.suffix', e.target.value)}/>
+                        <select className="border-b border px-2 py-1 font-semibold" name="suffix" value={resident?.name?.suffix || ''}  onChange={e=>handleChange('name.suffix', e.target.value)}>
+                            <option value="">None</option>
+                            <option value="JR">Jr</option>
+                            <option value="SR">Sr</option>
+                            <option value="II">II</option>
+                            <option value="III">III</option>
+                            <option value="IV">IV</option>
+                        </select>
                     </div>
                     <div className="flex flex-col w-1/12">
                         <label className="text-sm">Gender</label>

@@ -3,6 +3,11 @@ import HouseholdDetails from '../components/HouseholdDetails';
 //import HouseholdNew from '../components/HouseholdNew';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import API_URL from '../constants/api';
+import CensusForm from '../components/CensusForm';
+import CensusFormOne from '../components/CensusFormOne';
 
 
 const censusReport = {
@@ -221,493 +226,172 @@ const households = [
     },
 ]
 
-const families = [
-    {
-        id: 1,
-        familyMembers: [
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
+const AddModal = ({onClose}) => {
+    const navigate = useNavigate()
+    const {id} = useParams();
+    const handleCreate = async () => {
+        onClose()
+    }
+
+    const [resident, setResident] = useState(
+        {
+            address: {
+                streetName: '',
+                apartment: '',
+                householdNumber: '',
+                sitio: ''
             },
-            {
+            head: {
                 name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
+                    first: '',
+                    last: '',
+                    middle: '',
+                    suffix: ''
                 },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
+                dateOfBirth: '',
+                sex: '',
+                civilStatus: '',
+                employment: {
+                    occupation: '',
                 },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
+                educationalAttainment: '',
+                religion: '',
+                sector: '',
+                voterInfo: {
+                    isRegistered: false
                 },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-        ],
-        householdID: 1
-    },
-    {
-        id: 1,
-        familyMembers: [
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-        ],
-        householdID: 1
-    },
-    {
-        id: 1,
-        familyMembers: [
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-        ],
-        householdID: 2
-    },
-    {
-        id: 1,
-        familyMembers: [
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-        ],
-        householdID: 3
-    },
-    {
-        id: 1,
-        familyMembers: [
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-            },
-        ],
-        householdID: 4
-    },
-]
+                pregnant: false,
+                p4: false,
+                registeredBusiness: false,
+                familyPlanning: false
+            }
+        }
+    )
+
+    const handleChange = (path, value) => {
+        setResident(prevState => {
+            const newState = { ...prevState };
+            let schema = newState;
+            const pList = path.split('.');
+            const len = pList.length;
+            for(let i = 0; i < len-1; i++) {
+                let elem = pList[i];
+                if( !schema[elem] ) schema[elem] = {}
+                schema = schema[elem];
+            }
+            schema[pList[len-1]] = value;
+            return newState;
+        });
+    }
+
+    const handleDateChange = (path, value) => {
+        if (value.length === 8) {
+            const formattedValue = value.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+            handleChange(path, formattedValue);
+        } else {
+            handleChange(path, value);
+        }
+    };
+
+    const prepareData = (data) => {
+        for (let key in data) {
+            if (typeof data[key] === 'object') {
+                prepareData(data[key]);
+            } else if (data[key] === '' || data[key] === null) {
+                data[key] = null;
+            } else if (typeof data[key] === 'string') {
+                data[key] = data[key].trim();
+                if(data[key] === '') {
+                    data[key] = null;
+                }
+            }
+        }
+    };
+
+    const handleSave = async () => {
+        const dateParts = resident.head.dateOfBirth.split('-');
+        if (dateParts.length !== 3) {
+            toast.dismiss();
+            toast.error('Invalid date format');
+            return;
+        }
+        if (dateParts[0].length !== 4 || dateParts[1].length !== 2 || dateParts[2].length !== 2) {
+            toast.dismiss();
+            toast.error('Invalid date format');
+            return;
+        }
+        if (parseInt(dateParts[1]) < 1 || parseInt(dateParts[1]) > 12) {
+            toast.dismiss();
+            toast.error('Invalid month');
+            return;
+        }
+
+        if (parseInt(dateParts[2]) < 1 || parseInt(dateParts[2]) > 31) {
+            toast.dismiss();
+            toast.error('Invalid day');
+            return;
+        }
+
+        try{
+            let dataToSubmit = { ...resident };
+            prepareData(dataToSubmit);
+
+            const {data} = await axios.post(`${API_URL}census/household/create/${id}`, dataToSubmit);
+            toast.success(data.message);
+
+            window.open(`/census/${id}/${data.data._id}`, '_blank');
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white p-8 rounded-md w-[90vw] flex flex-col flex-wrap">
+                <h1 className="text-2xl font-semibold">Add Household</h1>
+                <p className='text-gray-600 font-semibold text-sm my-2'>Make sure to input correct address, you cannot change it after creating household</p>
+                <div className="mt-4">
+                    <h3 className="font-semibold text-sm bg-blue-500 text-white w-fit p-2">Address</h3>
+                    <div className="flex gap-4 mt-2 flex-wrap">
+                        <div className="flex flex-col">
+                            <label className="text-xs" htmlFor="street">Street</label>
+                            <input type="text" name="street" className="border-b border px-2 py-1" value={resident?.address?.streetName || ''} onChange={e=>handleChange('address.streetName', e.target.value)}/>
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-xs" htmlFor="houseNumber">House Number</label>
+                            <input type="text" name="houseNumber" className="border-b border px-2 py-1" value={resident?.address?.householdNumber || ''} onChange={e=>handleChange('address.householdNumber', e.target.value)}/>
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-xs" htmlFor="apartment">Apartment</label>
+                            <input type="text" name="apartment" className="border-b border px-2 py-1" value={resident?.address?.apartment || ''} onChange={e=>handleChange('address.apartment', e.target.value)}/>
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-xs" htmlFor="sitio">Sitio</label>
+                            <input type="text" name="sitio" className="border-b border px-2 py-1" value={resident?.address?.sitio || ''} onChange={e=>handleChange('address.sitio', e.target.value)}/>
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-4">
+                    <h3 className="font-semibold text-sm p-2 bg-green-500 text-white w-fit">Head</h3>
+                    <CensusFormOne resident={resident.head} edit={true} onInputChange={handleChange} onDateChange={handleDateChange}/>
+                </div>
+                <div className="flex justify-end gap-4 mt-4">
+                    
+                    <button onClick={onClose} className="bg-gray-500 text-white px-4 py-1 rounded-sm">Cancel</button>
+                    <button onClick={handleSave} className="bg-green-500 text-white px-4 py-1 rounded-sm">Create</button>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 const CensusItem = () => {
     const {id} = useParams();
     const [activeHousehold, setActiveHousehold] = useState(null);
     const [addNewHousehold, setAddNewHousehold] = useState(false);
+    const [addModal, setAddModal] = useState(false);
+
     return (
         <div className='ml-64 flex w-full flex-col'>
             <div className="w-full flex p-8 overflow-y-auto gap-4" >
@@ -826,7 +510,7 @@ const CensusItem = () => {
                         </div>
                         
                     </div>
-                    <Link to={`household/new`} target='_blank' className='w-full text-center bg-green-500 text-white p-2 rounded-md mt-6 hover:bg-green-600 transition-all'>Add New Household</Link>
+                    <button onClick={()=>setAddModal(true)} className='w-full text-center bg-green-500 text-white p-2 rounded-md mt-6 hover:bg-green-600 transition-all'>Add New Household</button>
                     
                 </div>
                 <div className='flex flex-col  rounded-md w-2/3 shadow-lg p-8 h-[85vh] '>
@@ -853,6 +537,9 @@ const CensusItem = () => {
 
                 </div>
             </div>
+            {
+                addModal && <AddModal onClose={() => setAddModal(false)}/>
+            }
         </div>
     )
 }
