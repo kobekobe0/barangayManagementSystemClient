@@ -8,6 +8,8 @@ import { toast } from 'react-hot-toast';
 import API_URL from '../constants/api';
 import CensusForm from '../components/CensusForm';
 import CensusFormOne from '../components/CensusFormOne';
+import validateDate from '../helper/validateDate';
+import prepareData from '../helper/prepareData';
 
 
 const censusReport = {
@@ -293,45 +295,14 @@ const AddModal = ({onClose}) => {
         }
     };
 
-    const prepareData = (data) => {
-        for (let key in data) {
-            if (typeof data[key] === 'object') {
-                prepareData(data[key]);
-            } else if (data[key] === '' || data[key] === null) {
-                data[key] = null;
-            } else if (typeof data[key] === 'string') {
-                data[key] = data[key].trim();
-                if(data[key] === '') {
-                    data[key] = null;
-                }
-            }
-        }
-    };
-
     const handleSave = async () => {
-        const dateParts = resident.head.dateOfBirth.split('-');
-        if (dateParts.length !== 3) {
+        toast.loading('Saving...');
+        const isDateValid = validateDate(resident.head.dateOfBirth);
+        if (!isDateValid) {
             toast.dismiss();
-            toast.error('Invalid date format');
+            toast.error('Invalid date of birth');
             return;
         }
-        if (dateParts[0].length !== 4 || dateParts[1].length !== 2 || dateParts[2].length !== 2) {
-            toast.dismiss();
-            toast.error('Invalid date format');
-            return;
-        }
-        if (parseInt(dateParts[1]) < 1 || parseInt(dateParts[1]) > 12) {
-            toast.dismiss();
-            toast.error('Invalid month');
-            return;
-        }
-
-        if (parseInt(dateParts[2]) < 1 || parseInt(dateParts[2]) > 31) {
-            toast.dismiss();
-            toast.error('Invalid day');
-            return;
-        }
-
         try{
             let dataToSubmit = { ...resident };
             prepareData(dataToSubmit);

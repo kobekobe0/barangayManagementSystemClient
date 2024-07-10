@@ -1,5 +1,4 @@
 import { useState } from "react";
-import handleDateInput from "../helper/dateInputHelper";
 import CensusForm from "./CensusForm";
 
 const household = 

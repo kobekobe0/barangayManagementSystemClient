@@ -3,6 +3,8 @@ import WebcamCapture from "./residents/ResidentCameraModal";
 import axios from "axios";
 import toast from "react-hot-toast";
 import API_URL from "../constants/api";
+import validateDate from "../helper/validateDate";
+import prepareData from "../helper/prepareData";
 
 const resident = {
     name: {
@@ -92,60 +94,19 @@ const ResidentInfo = ({residentData}) => {
         }
     };
 
-    const prepareData = (data) => {
-        for (let key in data) {
-            if (typeof data[key] === 'object') {
-                prepareData(data[key]);
-            } else if (data[key] === '') {
-                data[key] = null;
-            }
-        }
-    };
-
     const handleSave = async () => {
-        const dateParts = resident.dateOfBirth.split('-');
-        if (dateParts.length !== 3) {
+        toast.loading('Saving changes...');
+        const isValidDate = validateDate(resident.dateOfBirth);
+        if (!isValidDate) {
             toast.dismiss();
-            toast.error('Invalid date format');
-            return;
-        }
-        if (dateParts[0].length !== 4 || dateParts[1].length !== 2 || dateParts[2].length !== 2) {
-            toast.dismiss();
-            toast.error('Invalid date format');
-            return;
-        }
-        if (parseInt(dateParts[1]) < 1 || parseInt(dateParts[1]) > 12) {
-            toast.dismiss();
-            toast.error('Invalid month');
-            return;
-        }
-
-        if (parseInt(dateParts[2]) < 1 || parseInt(dateParts[2]) > 31) {
-            toast.dismiss();
-            toast.error('Invalid day');
+            toast.error('Invalid birth date format');
             return;
         }
         if(resident.dateOfDeath && resident.dateOfDeath !== ''){
-            const dateParts2 = resident.dateOfDeath.split('-');
-            if (dateParts2.length !== 3) {
+            const isValidDeathDate = validateDate(resident.dateOfDeath);
+            if (!isValidDeathDate) {
                 toast.dismiss();
                 toast.error('Invalid death date format');
-                return;
-            }
-            if (dateParts2[0].length !== 4 || dateParts2[1].length !== 2 || dateParts2[2].length !== 2) {
-                toast.dismiss();
-                toast.error('Invalid death date format');
-                return;
-            }
-            if (parseInt(dateParts2[1]) < 1 || parseInt(dateParts2[1]) > 12) {
-                toast.dismiss();
-                toast.error('Invalid death month');
-                return;
-            }
-
-            if (parseInt(dateParts2[2]) < 1 || parseInt(dateParts2[2]) > 31) {
-                toast.dismiss();
-                toast.error('Invalid death day');
                 return;
             }
         }

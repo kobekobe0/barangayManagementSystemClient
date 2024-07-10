@@ -1,4 +1,4 @@
-const CensusForm = ({resident, edit, onMemberValueChange }) => {
+const CensusForm = ({resident, edit, onMemberValueChange, handleSave, removeModal }) => {
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         onMemberValueChange(resident._id, name, value);
@@ -36,7 +36,7 @@ const CensusForm = ({resident, edit, onMemberValueChange }) => {
                     </div>
                     <div className="flex flex-col w-[5%]">
                         <label className="text-xs" htmlFor="sex">Gender</label>
-                        <select className="border-b border px-2 py-1" name="sex" value={resident?.sex || ''} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="sex" value={resident?.sex || ''} disabled={!edit}>
                             <option value="">Unset</option>
                             <option value="M">Male</option>
                             <option value="F">Female</option>
@@ -44,7 +44,7 @@ const CensusForm = ({resident, edit, onMemberValueChange }) => {
                     </div>
                     <div className="flex flex-col w-[7%]">
                         <label className="text-xs" htmlFor="civilStatus">Civil Status</label>
-                        <select className="border-b border px-2 py-1" name="civilStatus" value={resident?.civilStatus || ''} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="civilStatus" value={resident?.civilStatus || ''} disabled={!edit}>
                             <option value="">Unset</option>
                             <option value="single">Single</option>
                             <option value="married">Married</option>
@@ -55,11 +55,11 @@ const CensusForm = ({resident, edit, onMemberValueChange }) => {
                     </div>
                     <div className="flex flex-col w-[8%]">
                         <label className="text-xs" htmlFor="occupation">Occupation</label>
-                        <input type="text" name="occupation" className="border-b border px-2 py-1" value={resident?.employment?.occupation || ''} disabled={!edit}/>
+                        <input onChange={handleInputChange} type="text" name="employment.occupation" className="border-b border px-2 py-1" value={resident?.employment?.occupation || ''} disabled={!edit}/>
                     </div>
                     <div className="flex flex-col w-[5%]">
                         <label className="text-xs" htmlFor="educationalAttainment">Education</label>
-                        <select className="border-b border px-2 py-1" name="educationalAttainment" value={resident?.educationalAttainment || ''} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="educationalAttainment" value={resident?.educationalAttainment || ''} disabled={!edit}>
                             <option value="elementary">Elementary</option>
                             <option value="highschool">Highschool</option>
                             <option value="undergraduate">Undergraduate</option>
@@ -71,7 +71,7 @@ const CensusForm = ({resident, edit, onMemberValueChange }) => {
 
                     <div className="flex flex-col w-[5%]">
                         <label className="text-xs" htmlFor="religion">Religion</label>
-                        <select className="border-b border px-2 py-1" name="religion" value={resident?.religion || ''} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="religion" value={resident?.religion || ''} disabled={!edit}>
                             <option value="">Unset</option>
                             <option value="Roman Catholic">Catholic</option>
                             <option value="Islam">Islam</option>
@@ -83,7 +83,7 @@ const CensusForm = ({resident, edit, onMemberValueChange }) => {
                     </div>
                     <div className="flex flex-col w-[5%]">
                         <label className="text-xs" htmlFor="sector">Sector</label>
-                        <select className="border-b border px-2 py-1" name="sector" value={resident?.sector || ''} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="sector" value={resident?.sector || ''} disabled={!edit}>
                             <option value="">None</option>
                             <option value="pwd">PWD</option>
                             <option value="senior">Senior Citizen</option>
@@ -92,36 +92,35 @@ const CensusForm = ({resident, edit, onMemberValueChange }) => {
                     </div>
                     <div className="flex flex-col w-[5%]">
                         <label className="text-xs" htmlFor="voterStatus">Voter</label>
-                        <select className="border-b border px-2 py-1" name="voterStatus" value={resident?.votingInfo?.isRegistered?.toString() || ''} disabled={!edit}>
-                            <option value="">Unset</option>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="voterInfo.isRegistered" value={resident?.voterInfo?.isRegistered?.toString() || ''} disabled={!edit}>
                             <option value="true">Yes</option>
                             <option value="false">No</option>
                         </select>
                     </div>
                     <div className="flex flex-col w-[4%]">
                         <label className="text-xs" htmlFor="pregnant">Pregnant</label>
-                        <select className="border-b border px-2 py-1" name="pregnant" value={resident?.pregnant?.toString() || 'false'} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="pregnant" value={resident?.pregnant?.toString() || 'false'} disabled={!edit}>
                             <option value="false">No</option>
                             <option value="true">Yes</option>
                         </select>
                     </div>
                     <div className="flex flex-col w-[4%]">
                         <label className="text-xs" htmlFor="p4">4P's</label>
-                        <select className="border-b border px-2 py-1" name="p4" value={resident?.p4?.toString() || 'false'} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="p4" value={resident?.p4?.toString() || 'false'} disabled={!edit}>
                             <option value="false">No</option>
                             <option value="true">Yes</option>
                         </select>
                     </div>
                     <div className="flex flex-col w-[5%]">
                         <label className="text-xs" htmlFor="registeredBusiness">Reg Business</label>
-                        <select className="border-b border px-2 py-1" name="registeredBusiness" value={resident?.registeredBusiness?.toString() || 'false'} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="registeredBusiness" value={resident?.registeredBusiness?.toString() || 'false'} disabled={!edit}>
                             <option value="false">No</option>
                             <option value="true">Yes</option>
                         </select>
                     </div>
                     <div className="flex flex-col">
                         <label className="text-xs" htmlFor="registeredBusiness">Fam Planning</label>
-                        <select className="border-b border px-2 py-1" name="registeredBusiness" value={resident?.familyPlanning?.toString() || 'false'} disabled={!edit}>
+                        <select onChange={handleInputChange} className="border-b border px-2 py-1" name="familyPlanning" value={resident?.familyPlanning?.toString() || 'false'} disabled={!edit}>
                             <option value="false">No</option>
                             <option value="true">Yes</option>
                         </select>
@@ -132,8 +131,8 @@ const CensusForm = ({resident, edit, onMemberValueChange }) => {
             {
                 edit && (
                     <div className="flex gap-2 item-center justify-end">
-                        <button className="bg-red-500 py-1 px-2 text-white rounded-sm text-sm">Delete</button>
-                        <button className="bg-green-500 py-1 px-2 text-white rounded-sm text-sm">Save</button>
+                        <button className="bg-red-500 py-1 px-2 text-white rounded-sm text-sm" onClick={removeModal}>Remove member</button>
+                        <button className="bg-green-500 py-1 px-2 text-white rounded-sm text-sm" onClick={handleSave}>Save</button>
                     </div>
                 )
             }

@@ -5,140 +5,7 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import axios from "axios";
 import toast from "react-hot-toast";
 import API_URL from "../constants/api.js";
-
-const household = 
-    {
-        id: 1,
-        address: {
-            street: 'Castro',
-            apartment: null,
-            householdNuber: '114',
-            sitio: null
-        },
-        head: {
-            name: {
-                first: 'Juan',
-                last: 'Dela Cruz',
-                middle: 'Bautista',
-                suffix: null
-            },
-            dateOfBirth: '1990-01-01',
-            sex: 'M',
-            civilStatus: 'married',
-            occupation: 'Farmer',
-            educationalAttainment: 'Elementary Graduate',
-            religion: 'Islam',
-            sector: null,
-            votingStatus: true,
-            pregnant: false,
-            p4: true,
-            registeredBusiness: true,
-        },
-    }
-
-const families = [
-    {
-        id: 1,
-        familyMembers: [
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-                _id: 66341
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-                _id: 42113
-            },
-            {
-                name: {
-                    first: 'Juan',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-                _id: 2141
-            },
-            {
-                name: {
-                    first: 'Juanaaa',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-                _id: 3123
-            },
-            {
-                name: {
-                    first: 'Juandsd',
-                    last: 'Dela Cruz',
-                    middle: 'Bautista',
-                    suffix: null
-                },
-                dateOfBirth: '1990-01-01',
-                sex: 'M',
-                civilStatus: 'Married',
-                occupation: 'Farmer',
-                educationalAttainment: 'Elementary Graduate',
-                religion: 'Roman Catholic',
-                sector: null,
-                votingStatus: true,
-                p4: true,
-                registered: true,
-                _id: 123
-            },
-        ],
-        householdID: 1
-    },
-]
+import prepareData from "../helper/prepareData";
 
 const Household = () => {
     const {householdId} = useParams()
@@ -148,6 +15,13 @@ const Household = () => {
     const [household, setHousehold] = useState(null)
     const [families, setFamilies] = useState([])
     const [members, setMembers] = useState([])
+
+    const formatDate = (dateString) => {
+        if (dateString.length === 8) {
+          return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
+        }
+        return dateString;
+    }
 
     const fetchHousehold = async () => {
         try {
@@ -165,9 +39,14 @@ const Household = () => {
         }
     }
 
+    useEffect(() => {
+        console.log(families)
+        console.log(members)
+    }, [families, members])
+
     const fetchFamilies = async () => {
         try {
-            const { data } = await axios.get(`${API_URL}census/family/household/${householdId}`);
+            const { data } = await axios.get(`${API_URL}census/family-in-household/${householdId}`);
     
             const newFamilies = data.data.map(family => ({
                 _id: family._id,
@@ -179,7 +58,29 @@ const Household = () => {
             const newMembers = data.data.flatMap(family =>
                 family.members.map(member => ({
                     ...member,
-                    dateOfBirth: member.dateOfBirth ? member.dateOfBirth.split('T')[0] : '' // Extract date part only
+                    dateOfBirth: member.dateOfBirth ? member.dateOfBirth.split('T')[0] : '',
+                    name: {
+                        first: member?.name?.first || '',
+                        last: member?.name?.last || '',
+                        middle: member?.name?.middle || '',
+                        suffix: member?.name?.suffix || ''
+                    },
+                    sex: member?.sex || '',
+                    civilStatus: member?.civilStatus || '',
+                    employment: {
+                        occupation: member?.employment?.occupation || ''
+                    },
+                    educationalAttainment: member?.educationalAttainment || '',
+                    religion: member?.religion || '',
+                    sector: member?.sector || null,
+                    voterInfo: {
+                        isRegistered: member?.voterInfo?.isRegistered || false,
+                    },
+                    pregnant: member?.pregnant || false,
+                    p4: member?.p4 || false,
+                    registered: member?.registered || false,
+                    familyPlanning: member?.familyPlanning || true,
+                    isSaved: true
                 }))
             );
     
@@ -189,11 +90,6 @@ const Household = () => {
             console.error(error.message);
         }
     };    
-
-    useEffect(() => {
-        console.log(families)
-        console.log(members)
-    }, [families, members])
 
     const [modal, setModal] = useState({
         title: '',
@@ -236,17 +132,90 @@ const Household = () => {
             dateOfBirth: '',
             sex: '',
             civilStatus: '',
-            occupation: '',
+            employment: {
+                occupation: ''
+            },
             educationalAttainment: '',
             religion: '',
             sector: null,
-            votingStatus: true,
+            voterInfo: {
+                isRegistered: false,
+            },
+            pregnant: false,
             p4: false,
             registered: false,
             familyPlanning: true,
-            _id: tempID
+            _id: tempID,
+            isSaved: false
         }]);
     }
+
+    // for each member, if onContextMenu, change isSaved to false (per member)
+    const handleMemberContextMenu = (e, memberID) => {
+        e.preventDefault();
+        setMembers(members.map(member => {
+            if (member._id === memberID) {
+                return {
+                    ...member,
+                    isSaved: false
+                }
+            }
+            return member;
+        }));
+    }
+        
+    const memoizedMembers = useMemo(() => members, [members]);
+
+    const handleMemberSave = async (memberID, familyID) => {
+        const member = memoizedMembers.find(member => member._id === memberID);
+
+        if (member.isSaved) return;
+
+        let dataToSubmit = {
+            member,
+            address: household.address,
+        }
+        prepareData(dataToSubmit)
+
+        console.log("TO SUBMIT: ", dataToSubmit)
+
+        try {
+            const { data } = await axios.post(`${API_URL}census/member/save/${familyID}`, dataToSubmit);
+
+            if (memberID.includes('tempID')) {
+                // Replace tempID with the actual ID, without changing the order in family.members
+                setFamilies(families.map(family => {
+                    if (family._id === familyID) {
+                        return {
+                            ...family,
+                            members: family.members.map(member => member === memberID ? data.data._id : member)
+                        };
+                    }
+                    return family;
+                }));
+            }
+
+            if(data.data?.dateOfBirth) {
+                data.data.dateOfBirth = data.data.dateOfBirth.split('T')[0]
+            }
+
+            setMembers(memoizedMembers.map(member => {
+                if (member._id === memberID) {
+                    return {
+                        ...member,
+                        ...data.data,
+                        isSaved: true
+                    };
+                }
+                return member;
+            }));
+
+            toast.success(data.message);
+        } catch (error) {
+            console.error(error.message);
+            toast.error('Failed to save member');
+        }
+    };
 
     const handleRemoveFamily = (familyID) => {
         // Remove family members based on familyID
@@ -256,8 +225,7 @@ const Household = () => {
         setFamilies(families.filter(family => family._id !== familyID));
     }
 
-    const handleRemoveFamilyMember = (memberID) => {
-        if(!edit) return;
+    const handleRemoveFamilyMember = (memberID, familyID) => {
         setModal({
             open: false,
             title: '',
@@ -279,8 +247,22 @@ const Household = () => {
             }
             return family;
         }));
-
     };
+
+    const handleMemberRemoveModal = (memberID, familyID) => {
+        if(memberID.includes('tempID')) {
+            handleRemoveFamilyMember(memberID, familyID)
+            return;
+        }
+        setModal({
+            title: 'Remove Member',
+            message: 'We have identified this resident already exists in our system. If some details are incorrect, please edit them to ensure accurate information. If you wish to remove this resident from the family members list, please click Confirm',
+            color: 'bg-red-500',
+            onConfirm: () => handleRemoveFamilyMember(memberID, familyID),
+            onCancel: () => setModal({ open: false, title: '', message: '', color: '', onConfirm: null, onCancel: null }),
+            open: true
+        });
+    }
 
     const handleMemberValueChange = useCallback((memberID, keyPath, value) => {
         setMembers(members => members.map(member => {
@@ -288,9 +270,18 @@ const Household = () => {
                 let updatedMember = { ...member };
     
                 // Check if the keyPath is 'dateOfBirth' and value is 8 characters long
-                if (keyPath === 'dateOfBirth' && value.length === 8) {
-                    // Format the date as 'YYYY-MM-DD'
-                    const formattedDate = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
+                if (keyPath === 'dateOfBirth') {
+                    let formattedDate
+                    if (value.length === 8) {
+                        formattedDate = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
+                    } else if (value.length === 9) {
+                        formattedDate = value.replace(/-/g, '');
+                    } else if (value.length >= 10) {
+                        //prevent user from typing more than 10 characters, replace last character with empty string
+                        formattedDate = value.slice(0, 10);
+                    } else {
+                        formattedDate = value;
+                    }
                     updatedMember[keyPath] = formattedDate;
                 } else {
                     // For other fields, update normally
@@ -309,21 +300,6 @@ const Household = () => {
             return member;
         }));
     }, []);
-    
-    const memoizedMembers = useMemo(() => members, [members]);
-
-    const openModal = (title, message, color, onConfirm, onCancel, e) => {
-        e.preventDefault();
-        if(!edit) return;
-        setModal({
-            title,
-            message,
-            color,
-            onConfirm,
-            onCancel,
-            open: true
-        })
-    }
 
     useEffect(() => {
         fetchHousehold()
@@ -398,16 +374,9 @@ const Household = () => {
 
                                     return (
                                         <div key={member._id} className={`${memberIndex % 2 === 0 ? 'bg-gray-200' : 'white'} p-2 hover:bg-red-300 transition-all`} onContextMenu={(e) => {
-                                            openModal(
-                                                'Remove Family Member',
-                                                'Are you sure you want to remove this family member?',
-                                                'bg-red-500',
-                                                () => handleRemoveFamilyMember(familyIndex, memberIndex, e),
-                                                () => { setModal({ open: false }) },
-                                                e
-                                            );
+                                            handleMemberContextMenu(e, member._id);
                                         }}>
-                                            <CensusForm key={member._id} resident={member} onMemberValueChange={handleMemberValueChange} edit={edit} />
+                                            <CensusForm key={member._id} resident={member} removeModal={()=>handleMemberRemoveModal(member._id, family._id)} onMemberValueChange={handleMemberValueChange} handleSave={() => handleMemberSave(member._id, family._id)} edit={!member?.isSaved} />
                                         </div>
                                     );
                                 })}

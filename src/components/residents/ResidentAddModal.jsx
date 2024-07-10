@@ -3,6 +3,8 @@ import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import API_URL from "../../constants/api";
+import validateDate from "../../helper/validateDate";
+import prepareData from "../../helper/prepareData";
 
 const ResidentAddModal = ({onClose}) => {
     const navigate = useNavigate()
@@ -24,16 +26,6 @@ const ResidentAddModal = ({onClose}) => {
         },
         sex: '',
     })
-
-    const prepareData = (data) => {
-        for (let key in data) {
-            if (typeof data[key] === 'object') {
-                prepareData(data[key]);
-            } else if (data[key] === '') {
-                data[key] = null;
-            }
-        }
-    };
 
     const handleChange = (path, value) => {
         setResident(prevState => {
@@ -91,27 +83,10 @@ const ResidentAddModal = ({onClose}) => {
             return;
         }
 
-        //check date format, should be yyyy-mm-dd, month should be 01-12, day should be 01-31
-        const dateParts = resident.dateOfBirth.split('-');
-        if (dateParts.length !== 3) {
+        const dateValid = validateDate(resident.dateOfBirth);
+        if (!dateValid) {
             toast.dismiss();
             toast.error('Invalid date format');
-            return;
-        }
-        if (dateParts[0].length !== 4 || dateParts[1].length !== 2 || dateParts[2].length !== 2) {
-            toast.dismiss();
-            toast.error('Invalid date format');
-            return;
-        }
-        if (parseInt(dateParts[1]) < 1 || parseInt(dateParts[1]) > 12) {
-            toast.dismiss();
-            toast.error('Invalid month');
-            return;
-        }
-
-        if (parseInt(dateParts[2]) < 1 || parseInt(dateParts[2]) > 31) {
-            toast.dismiss();
-            toast.error('Invalid day');
             return;
         }
     
@@ -130,7 +105,8 @@ const ResidentAddModal = ({onClose}) => {
         } catch (error) {
             onClose();
             toast.dismiss();
-            toast.error('An error occured while adding resident');
+            console.log(error)
+            toast.error(error.response.data.message);
         }
     };
     
