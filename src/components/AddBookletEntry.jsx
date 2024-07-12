@@ -1,14 +1,33 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
+import API_URL from "../constants/api";
+import toast from "react-hot-toast";
 
 const AddBookletEntry = ({onClose}) => {
     const navigate = useNavigate()
+    const [bookletNumber, setBookletNumber] = useState('')
+    const [startOfOR, setStartOfOR] = useState('')
+    const [preparedBy, setPreparedBy] = useState('')
+    const [error, setError] = useState('')
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        onClose()
-        const bookletID = '3431234'
-        // TODO: API call, wait for response, then navigate to the new receipt/booklet created
-        navigate(`/receipts/${bookletID}`)
+    const handleSubmit = async (e) => {
+        try{
+            if(bookletNumber.trim() == '' || startOfOR.trim() == '' || preparedBy.trim() == '') {
+                setError('Please fill out all fields')
+                setTimeout(()=>setError(''), 3000)
+                return
+            }
+            const {data} = await axios.post(`${API_URL}receipt/create`, {
+                bookletNumber,
+                startOfOR,
+                preparedBy,
+            })
+            toast.success(data.message)
+            navigate(`/receipts/${data.data._id}`)
+        } catch (error) {
+            console.log(error)
+        }
     }
     
     return (
@@ -21,16 +40,16 @@ const AddBookletEntry = ({onClose}) => {
                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <h3 className="text-lg leading-6 font-medium text-gray-900">Add New OR Report</h3>
                         <div className="mt-4">
-                            
+                            <p className="text-red-500 text-sm">{error}</p>
                             <label className="text-md">Booklet Number</label>
-                            <input type="text" className="p-2 border border-gray-600 rounded-md w-full mb-4"/>
+                            <input onChange={e=>setBookletNumber(e.target.value)} value={bookletNumber} type="text" className="p-2 border border-gray-600 rounded-md w-full mb-4"/>
 
                             <label className="text-md">OR Number</label>
-                            <input type="text" className="p-2 border border-gray-600 rounded-md w-full"/>
+                            <input onChange={e=>setStartOfOR(e.target.value)} value={startOfOR} type="number" className="p-2 border border-gray-600 rounded-md w-full"/>
                             <p className="text-sm text-gray-500 mb-4">Enter the first OR number to record</p>
 
                             <label className="text-md">Prepared By</label>
-                            <input type="text" className="p-2 border border-gray-600 rounded-md w-full mb-4"/>
+                            <input onChange={e=>setPreparedBy(e.target.value)} value={preparedBy} type="text" className="p-2 border border-gray-600 rounded-md w-full mb-4"/>
                             
                         </div>
                     </div>
