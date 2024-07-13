@@ -30,7 +30,7 @@ const CensusFormOne = ({resident, edit, onInputChange, onDateChange}) => {
                     <input maxLength={10} type="text" name="dob" className="border-b border px-2 py-1" value={resident?.dateOfBirth || ''} onChange={e=>onDateChange('head.dateOfBirth', e.target.value)}/>
                 </div>
                 <div className="flex flex-col w-[5%]">
-                    <label className="text-xs" htmlFor="sex">Gender</label>
+                    <label className="text-xs" htmlFor="sex">Sex</label>
                     <select className="border-b border px-2 py-1" name="sex" value={resident?.sex || ''} onChange={e=>onInputChange('head.sex', e.target.value)}>
                         <option value="">Unset</option>
                         <option value="M">Male</option>

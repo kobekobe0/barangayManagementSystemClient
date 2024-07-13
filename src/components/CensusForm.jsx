@@ -35,7 +35,7 @@ const CensusForm = ({resident, edit, onMemberValueChange, handleSave, removeModa
                         <input onChange={handleInputChange} type="text" name="dateOfBirth" className="border-b border px-2 py-1" value={resident?.dateOfBirth || ''} disabled={!edit}/>
                     </div>
                     <div className="flex flex-col w-[5%]">
-                        <label className="text-xs" htmlFor="sex">Gender</label>
+                        <label className="text-xs" htmlFor="sex">Sex</label>
                         <select onChange={handleInputChange} className="border-b border px-2 py-1" name="sex" value={resident?.sex || ''} disabled={!edit}>
                             <option value="">Unset</option>
                             <option value="M">Male</option>

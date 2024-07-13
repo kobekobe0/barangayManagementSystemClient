@@ -202,7 +202,7 @@ const ResidentInfo = ({residentData}) => {
                         </select>
                     </div>
                     <div className="flex flex-col w-1/12">
-                        <label className="text-sm">Gender</label>
+                        <label className="text-sm">Sex</label>
                         <select className="border py-2 px-1 font-semibold" value={resident?.sex || ''} onChange={e=>handleChange('sex', e.target.value)}>
                             <option value="M">Male</option>
                             <option value="F">Female</option>

@@ -158,7 +158,7 @@ const ResidentAddModal = ({onClose}) => {
                                 <input type="number" className="p-2 border border-gray-300 rounded-sm w-full mb-4" value={resident.yrsOfResidency} onChange={e=>handleChange('yrsOfResidency', e.target.value)}/>
                             </div>
                             <div className="flex flex-col">
-                                <label className="text-sm">Gender</label>
+                                <label className="text-sm">Sex</label>
                                 <select className="p-2 border border-gray-300 rounded-sm w-full mb-4" value={resident.sex} onChange={e=>handleChange('sex', e.target.value)}>
                                     <option value="M">Male</option>
                                     <option value="F">Female</option>

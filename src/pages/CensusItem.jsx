@@ -407,7 +407,7 @@ const CensusItem = () => {
                                 </div>
                            
                             
-                                <h2 className="text-sm text-gray-700 font-semibold mt-2">Gender</h2>
+                                <h2 className="text-sm text-gray-700 font-semibold mt-2">Sex</h2>
                                 <hr />
                                 <div className='flex justify-between items-center'>
                                     <div className='flex items-center gap-2'>
