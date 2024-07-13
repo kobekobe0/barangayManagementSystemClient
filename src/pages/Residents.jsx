@@ -4,43 +4,6 @@ import ResidentAddModal from "../components/residents/ResidentAddModal"
 import axios from "axios"
 import API_URL from "../constants/api"
 
-// const residentsdata = [
-//     {
-//         _id: 1,
-//         name: {
-//             first: 'John',
-//             last: 'Doe',
-//             middle: 'Smith',
-//             suffix: null
-//         },
-//         dateOfBirth: new Date('01-01-1990'),    
-//         profile: null,
-//     },
-//     {
-//         _id: 2,
-//         name: {
-//             first: 'Jane',
-//             last: 'Doe',
-//             middle: 'Smith',
-//             suffix: null
-//         },
-//         dateOfBirth: new Date('1990-01-01'),    
-//         profile: null,
-//     },
-//     {
-//         _id: 3,
-//         name: {
-//             first: 'John',
-//             last: 'Doe',
-//             middle: 'Smith',
-//             suffix: null
-//         },
-//         dateOfBirth: new Date('1990-01-01'),    
-//         profile: null,
-    
-//     }
-// ]
-
 const ResidentCard = ({resident}) => {
     return (
         <Link to={`${resident._id}`} className="w-full hover:bg-gray-200 transition-all rounded-md border border-b my-2 p-4 flex justify-between items-center cursor-pointer">
@@ -129,26 +92,26 @@ const Residents = () => {
         <div className="ml-64 p-8 w-full flex flex-col">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-semibold">Residents</h1>
-                <div className="flex items-center gap-1 justify-end">
-                <input 
-                    className="p-2 w-2/12 border border-gray-400 " 
-                    type="text" 
-                    placeholder="First Name" 
-                    onChange={e => setSearch({ ...search, searchFirst: e.target.value })}
-                />
-                <input 
-                    className="p-2 w-2/12 border border-gray-400 " 
-                    type="text" 
-                    placeholder="Middle Name" 
-                    onChange={e => setSearch({ ...search, searchMiddle: e.target.value })}
-                />
-                <input 
-                    className="p-2 w-2/12 border border-gray-400 " 
-                    type="text" 
-                    placeholder="Last Name" 
-                    onChange={e => setSearch({ ...search, searchLast: e.target.value })}
-                />
-                    <button onClick={()=> setAddModal(true)} className="bg-green-500 text-white px-4 py-2 rounded-md">Add Resident</button>
+                <div className="flex items-center justify-end">
+                    <input 
+                        className="p-2 w-2/12 border border-gray-400 " 
+                        type="text" 
+                        placeholder="First Name" 
+                        onChange={e => setSearch({ ...search, searchFirst: e.target.value })}
+                    />
+                    <input 
+                        className="p-2 w-2/12 border border-gray-400 " 
+                        type="text" 
+                        placeholder="Middle Name" 
+                        onChange={e => setSearch({ ...search, searchMiddle: e.target.value })}
+                    />
+                    <input 
+                        className="p-2 w-2/12 border border-gray-400 " 
+                        type="text" 
+                        placeholder="Last Name" 
+                        onChange={e => setSearch({ ...search, searchLast: e.target.value })}
+                    />
+                    <button onClick={()=> setAddModal(true)} className="bg-green-500 text-white ml-2 px-4 py-2 rounded-md">Add Resident</button>
                 </div>
             </div>
             <div className="flex flex-col w-full mt-8">

@@ -7,68 +7,6 @@ import axios from "axios";
 import API_URL from "../constants/api";
 import toast from "react-hot-toast";
 
-// const resident = {
-//     name: {
-//         first: "Juan",
-//         last: "Dela Cruz",
-//         middle: "Garcia",
-//         suffix: "Jr.",
-//     },
-//     dateOfBirth: new Date("1990-01-01"),
-//     dateOfDeath: null,
-//     placeOfBirth: "Manila, Philippines",
-//     address: {
-//         streetName: "123 Main St",
-//         apartment: "Unit 1A",
-//         householdNumber: "123",
-//         sitio: "Sitio Uno",
-//     },
-//     bloodType: "O",
-//     sex: "M",
-//     citizenship: "Filipino",
-//     civilStatus: "Single",
-//     mobileNumber: "09171234567",
-//     landlineNumber: "0271234567",
-//     emergencyContact: {
-//         name: {
-//             first: "Maria",
-//             last: "Dela Cruz",
-//             middle: "Santos",
-//             suffix: "",
-//         },
-//         relationship: "Mother",
-//         mobileNumber: "09181234567",
-//         address: "456 Elm St, Sitio Uno",
-//     },
-//     weight: 70, // in kg
-//     height: 170, // in cm
-//     educationalAttainment: "College Graduate",
-//     IDs: {
-//         TIN: "123-456-789",
-//         SSS: "01-2345678-9",
-//         PAGIBIG: "1234-5678-9101",
-//         PhilHealth: "1234-5678-9101",
-//     },
-//     voterInfo: {
-//         precinctNumber: "001",
-//         voterID: "V123456789",
-//     },
-//     picture: null,
-//     signature: "path/to/signature.jpg",
-//     religion: "Catholic",
-//     employment: {
-//         occupation: "Software Engineer",
-//         employer: "Tech Company",
-//         employerAddress: "789 Tech Park, Manila",
-//         yearsEmployed: 5,
-//         employmentStatus: "Employed",
-//     },
-//     dateOfResidency: new Date("2015-06-01"),
-//     blocked: null, // Assuming there is no blocked log reference initially
-//     isBlocked: false,
-// };
-
-
 const BlockModal = ({resident, onClose}) => {
     const [reason, setReason] = useState('')
     const blockResident = async () => {
@@ -212,7 +150,7 @@ const ResidentItem = () => {
                     </div>
                 </div>
             </div>
-            <div className="shadow-lg flex w-3/4">
+            <div className="flex w-3/4 h-fit">
                 {
                     activeTab === 'form' ? <ResidentFormRequest /> : null
                 }
