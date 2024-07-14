@@ -4,6 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../constants/api";
 import InputField from "../components/receipts/InputField";
+import validateDate from "../helper/validateDate";
 
 const ReceiptItem = () => {
     const {id} = useParams()
@@ -96,9 +97,37 @@ const ReceiptItem = () => {
         setBooklet({...booklet, items: newItems})
     }
     
-    const handleSave = () => {
-        setIsSaved(true)
-        console.log(booklet.items)
+
+    //check if the date is valid, if empty or null, leave it as is, only check if it is not empty. Date should be in the format yyyy-mm-dd and string
+    const checkItemDates = (items) => {
+        for (let i = 0; i < items.length; i++) {
+            const date = items[i]?.date;
+            if (date && date.trim() !== '') {
+                if (!validateDate(date)) {
+                    return false;
+                }
+                console.log(date);
+            }
+        }
+        return true;
+    };
+
+
+    const handleSave = async () => {
+        if (!checkItemDates(booklet.items)) {
+            toast.error('Invalid date format')
+            return
+        }
+        try {
+            const itemsArray = Array.isArray(booklet.items) ? booklet.items : Object.values(booklet.items);
+            const {data} = await axios.put(`${API_URL}receipt/${id}`, {items: itemsArray})
+            console.log(data)
+            toast.success('Report saved successfully')
+            setIsSaved(true)
+        } catch (error) {
+            console.log(error)
+            toast.error('Failed to save report')
+        }
     }
 
     if (!booklet) {
@@ -128,7 +157,7 @@ const ReceiptItem = () => {
                             ₱ {booklet?.items.reduce((acc, item) => acc + item.amount, 0).toFixed(2).toLocaleString()}
                         </h2>
                     </div>
-                    <button className="bg-green-500 text-white p-2 rounded-md mt-8 hover:bg-green-600 transition-all" onClick={handleSave}>Save Report</button>
+                    <button className={`bg-green-500 text-white p-2 rounded-md mt-8 hover:bg-green-600 transition-all ${isSaved && 'opacity-55'}`} onClick={handleSave} disabled={isSaved}>Save Report</button>
                     <button className="bg-blue-500 text-white p-2 rounded-md mt-8 hover:bg-blue-600 transition-all">Print Report</button>
                     <button className=" text-red-400 border border-red-400 p-2 rounded-md mt-8 hover:bg-red-400 hover:text-white transition-all">Delete Booklet Entry</button>
                 </div>
@@ -172,7 +201,7 @@ const ReceiptItem = () => {
                         `}>
                             {
                                 isSaved 
-                                    ? <svg xmlns="http://www.w3.org/2000/svg" width="1.5" height="1.5" viewBox="0 0 20 20"><path fill="green" d="m15.3 5.3l-6.8 6.8l-2.8-2.8l-1.4 1.4l4.2 4.2l8.2-8.2z"/></svg>
+                                    ? <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 20 20"><path fill="green" d="m15.3 5.3l-6.8 6.8l-2.8-2.8l-1.4 1.4l4.2 4.2l8.2-8.2z"/></svg>
                                     : <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 32 32"><path fill="red" d="M30 19.4L28.6 18L25 21.6L21.4 18L20 19.4l3.6 3.6l-3.6 3.6l1.4 1.4l3.6-3.6l3.6 3.6l1.4-1.4l-3.6-3.6z"/><path fill="black" d="M16 26h-4v-8h4v-2h-4c-1.1 0-2 .9-2 2v8H6V6h4v4c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V6.4l4 4V16h2v-6c0-.3-.1-.5-.3-.7l-5-5c-.2-.2-.4-.3-.7-.3H6c-1.1 0-2 .9-2 2v20c0 1.1.9 2 2 2h10zM12 6h8v4h-8z"/></svg>
                             }
                         </p>
@@ -189,7 +218,7 @@ const ReceiptItem = () => {
                             booklet?.items?.map((item, index) => (
                                 <div key={item.ORNumber} className="flex justify-between items-center border-gray-200 w-full">
                                     <p className="w-1/12 border text-center px-2 py-1 text-lg text-gray-500 font-semibold">{item?.ORNumber}</p>
-                                    <InputField width={'w-2/12'} label="Date" value={item?.date} onChange={(e) => handleInputChange(index, 'date', e)} />
+                                    <InputField width={'w-2/12'} label="Date" value={item?.date?.split('T')[0] || ''} onChange={(e) => handleInputChange(index, 'date', e)} />
                                     <InputField width={'w-3/12'} label="Name" value={item?.name} onChange={(e) => handleInputChange(index, 'name', e)} />
                                     <InputField width={'w-4/12'} label="Nature" value={item?.nature} onChange={(e) => handleInputChange(index, 'nature', e)} />
                                     <InputField width={'w-2/12'} label="Amount" value={item?.amount.toString()} onChange={(e) => handleInputChange(index, 'amount', e)} />
