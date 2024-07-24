@@ -1,6 +1,9 @@
+import axios from "axios"
+import API_URL from "../constants/api"
 import ResidentInfo from "./ResidentInfo"
 import ResidentFormModal from "./residents/ResidentFormModal"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 
 const forms = [
     {
@@ -140,7 +143,7 @@ const businesses = [
 
 const BusinessCard = ({business}) => {
     return (
-        <div className="w-full hover:bg-gray-200 transition-all rounded-md border border-b my-2 p-4 flex justify-between items-center cursor-pointer">
+        <Link to={`/business/${business._id}`} className="w-full hover:bg-gray-200 transition-all rounded-md border border-b my-2 p-4 flex justify-between items-center cursor-pointer">
             <div className="flex items-center gap-4">
                 <div className="flex items-center gap-4">
                     <div className={`h-2 w-2 ${business.isClosed ? 'bg-red-500' : 'bg-green-500'} text-white rounded-full`}></div>
@@ -154,15 +157,28 @@ const BusinessCard = ({business}) => {
             </div>
             <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-gray-500">
-                    {business.residentID.name.last}, {business.residentID.name.first} {business.residentID.name.middle}
+                    {business?.natureOfBusiness}
                 </span>
             </div>
-        </div>
+        </Link>
     )
 }
 
-const ResidentFormRequest = () => { // TODO: FORM LIST
+const ResidentFormRequest = ({id}) => { // TODO: FORM LIST
     const [activeForm, setActiveForm] = useState(null)
+    const [businesses, setBusinesses] = useState([])
+    const fetchBusinesses = async () => {
+        try {
+            const {data} = await axios.get(`${API_URL}business?residentID=${id}`)
+            setBusinesses(data.data)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchBusinesses()
+    }, [id])
     return (
         <div className="flex flex-col w-full justify-center">
             <div className="flex flex-col p-8 w-full h-fit shadow-lg ">
@@ -205,10 +221,9 @@ const ResidentFormRequest = () => { // TODO: FORM LIST
             <div className="flex flex-col p-8 w-full h-fit shadow-lg fit">
                 
                 <div className="flex my-4 justify-between gap-4">
-                    <h3 className="font-semibold text-2xl text-gray-700">Business</h3>
-                    {
-                        businesses.length > 0 && <button className="bg-green-500 text-white p-2 rounded-md w-1/6">Add Business</button>
-                    }
+                    <h3 className="font-semibold text-lg text-gray-700">Business</h3>
+                    <Link to='/business' className="bg-green-500 text-white p-2 rounded-md w-1/6 text-center">Add Business</Link>
+                    
                 </div>
                 <div className="flex flex-col w-full items-center">
                     {
@@ -221,10 +236,7 @@ const ResidentFormRequest = () => { // TODO: FORM LIST
             <div className="flex flex-col p-8 w-full h-fit shadow-lg fit">
                 
                 <div className="flex my-4 justify-between gap-4">
-                    <h3 className="font-semibold text-2xl text-gray-700">Help Received History</h3>
-                    {
-                        businesses.length > 0 && <button className="bg-green-500 text-white p-2 rounded-md w-1/6">Add Business</button>
-                    }
+                    <h3 className="font-semibold text-lg text-gray-700">Help Received History</h3>
                 </div>
                 <div className="flex flex-col w-full items-center">
                     {
