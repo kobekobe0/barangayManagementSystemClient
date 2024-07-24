@@ -17,6 +17,12 @@ import Cedula from './pages/Cedula'
 import Residents from './pages/Residents'
 import ResidentItem from './pages/ResidentItem'
 import { Toaster } from 'react-hot-toast'
+import Business from './pages/Business'
+import BusinessItem from './pages/BusinessItem'
+import Indigent from './pages/Indigent'
+import BlockLog from './pages/BlockLogs'
+import CedulaItem from './pages/CedulaItem'
+import Temp from './pages/Temp'
 
 const router = createBrowserRouter([
   {
@@ -46,7 +52,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'cedula/:id',
-        element: <Cedula /> //TODO
+        element: <CedulaItem /> //TODO
       },
       {
         path:'residents',
@@ -55,6 +61,26 @@ const router = createBrowserRouter([
       {
         path: 'residents/:id',
         element: <ResidentItem />
+      },
+      {
+        path: 'business',
+        element: <Business />
+      },
+      {
+        path: 'business/:id',
+        element: <BusinessItem />
+      },
+      {
+        path: 'indigent',
+        element: <Indigent />
+      },
+      {
+        path: 'blocklist',
+        element: <BlockLog/>
+      },
+      {
+        path: 'temp',
+        element: <Temp/>
       },
       {
         path: 'forms',

@@ -118,12 +118,12 @@ const Receipts = () => {
                 </p>
                 <div className="flex gap-2">
                     <button onClick={() => setPage(page - 1)} className="hover:bg-gray-300 flex items-center rounded-full border" disabled={page <= 1}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24"><path fill="none" stroke={page <= 1 ? 'lightgray' : 'black'} stroke-width="2" d="m15 6l-6 6l6 6"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24"><path fill="none" stroke={page <= 1 ? 'lightgray' : 'black'} strokeWidth="2" d="m15 6l-6 6l6 6"/></svg>
                     </button>
 
 
                     <button onClick={() => setPage(page + 1)} className="hover:bg-gray-300 flex items-center rounded-full border" disabled={page >= totalPages}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24"><path fill="none" stroke={page >= totalPages ? 'lightgray' : 'black'} stroke-width="2" d="m9 6l6 6l-6 6"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24"><path fill="none" stroke={page >= totalPages ? 'lightgray' : 'black'} strokeWidth="2" d="m9 6l6 6l-6 6"/></svg>
                     </button>
                 </div>
 

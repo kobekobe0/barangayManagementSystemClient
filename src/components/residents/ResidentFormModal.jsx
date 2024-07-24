@@ -46,7 +46,7 @@ const FormDisplay = ({ form }) => {
     );
   };
   
-const form = {
+const form = { // TODO: Change OTCNo to CTCNo
   residentID: {
     businessName: 'Business Name',
     location: "Cacarong Matanda",
