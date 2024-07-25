@@ -23,6 +23,7 @@ import Indigent from './pages/Indigent'
 import BlockLog from './pages/BlockLogs'
 import CedulaItem from './pages/CedulaItem'
 import Temp from './pages/Temp'
+import Forms from './pages/Forms'
 
 const router = createBrowserRouter([
   {
@@ -84,7 +85,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'forms',
-        element: <Census />
+        element: <Forms />
       }
     ]
   },

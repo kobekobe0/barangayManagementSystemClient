@@ -152,7 +152,7 @@ const ResidentItem = () => {
             </div>
             <div className="flex w-3/4 h-fit">
                 {
-                    activeTab === 'form' ? <ResidentFormRequest id={id}/> : null
+                    activeTab === 'form' ? <ResidentFormRequest id={id} resident={resident}/> : null
                 }
                 {
                     activeTab === 'info' ? <ResidentInfo residentData={resident}/> : null

@@ -131,6 +131,9 @@ const AddBusiness = () => {
                                     <p className="text-sm">{selectedResident?.address}</p>
                                 )
                             }
+                            {
+                                selectedResident?.isBlocked && <p className="text-red-500">This resident is blocked</p>
+                            }
                         </div>
                     </div>
                 )

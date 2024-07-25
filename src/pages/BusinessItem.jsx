@@ -7,6 +7,7 @@ import API_URL from "../constants/api"
 import CloseModal from "../components/business/CloseModal"
 import DeleteModal from "../components/business/DeleteModal"
 import RequestClearance from "../components/business/RequestClearance"
+import ClosedBusiness from "../components/business/ClosedBusiness"
 
 const BusinessItem = () => {
     const [activeTab, setActiveTab] = useState('forms')
@@ -15,6 +16,7 @@ const BusinessItem = () => {
     const [openDelete, setOpenDelete] = useState(false)
 
     const [openBusinessClearance, setOpenBusinessClearance] = useState(false)
+    const [openClosedClearance, setOpenClosedClearance] = useState(false)
 
     const {id} = useParams()
 
@@ -126,8 +128,16 @@ const BusinessItem = () => {
                     </div>
                     <hr className="my-4"/>
                     <div className="flex flex-col gap-4">
-                        <button onClick={()=> setOpenBusinessClearance(true)} disabled={business?.residentID?.isBlocked} className="bg-blue-500 text-white w-full p-2 rounded-md">Business Permit</button>
-                        <button className="bg-blue-500 text-white w-full p-2 rounded-md">Solid Waste *</button>
+                        {
+                            !business?.isClosed && (
+                                <button onClick={()=> setOpenBusinessClearance(true)} disabled={business?.residentID?.isBlocked} className="bg-blue-500 text-white w-full p-2 rounded-md">Business Permit</button>
+                            )
+                        }
+                        {
+                            business?.isClosed && (
+                                <button onClick={()=> setOpenClosedClearance(true)} disabled={business?.residentID?.isBlocked} className="bg-blue-500 text-white w-full p-2 rounded-md">Closed Business Permit</button>
+                            )
+                        }
                         <button onClick={()=>setActiveTab('forms')} className="bg-green-500 text-white w-full p-2 rounded-md">Recent Forms</button>
                         <button onClick={()=>setActiveTab('edit')} className="bg-orange-500 text-white w-full p-2 rounded-md">Edit Details</button>
                         {
@@ -150,6 +160,10 @@ const BusinessItem = () => {
                 }
                 {
                     openBusinessClearance && <RequestClearance business={business} title='Generate Business Clearance' setOpen={setOpenBusinessClearance}/>
+                }
+
+                {
+                    openClosedClearance && <ClosedBusiness business={business} title='Generate Closed Business Clearance' setOpen={setOpenClosedClearance}/>
                 }
             </div>
         </div>
