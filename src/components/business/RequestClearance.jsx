@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState } from 'react'
 import API_URL from '../../constants/api';
 import axios from 'axios';
-
+import toast from 'react-hot-toast';
 
 const RequestClearance = ({ business, title, setOpen }) => {
     const [additionalData, setAdditionalData] = useState({
         year: new Date().getFullYear(),
         CTCNo: '',
         ORNo: '',
-        placeIssued: 'Bry Hall, Cacarong Matanda, Pandi, Bulacan',
+        placeIssued: 'Pandi, Bulacan',
         dateIssued: '',
         purpose: '',
     })
@@ -21,22 +21,25 @@ const RequestClearance = ({ business, title, setOpen }) => {
         });
     }
 
-    async function processImage(imageUrl) {
-        try {
-          const pictureFile = await fetch(imageUrl);
-          const blob = await pictureFile.blob();
-          const reader = new FileReader();
-          return new Promise((resolve) => {
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(blob);
-          });
-        } catch (error) {
-          console.error('Error fetching or processing image:', error);
-          throw error;
-        }
+    const setDateToNow = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const formattedDate = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+        setAdditionalData({
+            ...additionalData,
+            dateIssued: formattedDate
+        })
     }
 
     const handleGenerate = async () => {
+        //check for values
+        if(!additionalData.dateIssued) {
+            toast.error('Please input a date issued');
+            return;
+        }
+
         const isConfirmed = await confirm('Are you sure you want to generate this document?');
         if (!isConfirmed) return;
 
@@ -118,7 +121,8 @@ const RequestClearance = ({ business, title, setOpen }) => {
                             
                             <label htmlFor="">Date Issued</label>
                             <input type="date" className="w-full p-2 border border-gray-600 rounded-md" name="dateIssued" value={additionalData.dateIssued} onChange={handleQueryChange} placeholder="First name"/>
-                            
+                            <button className='text-white text-sm px-2 py-1 w-1/6 bg-green-500 self-end rounded-md' onClick={setDateToNow}>Set Date To Now</button>
+
                             <label htmlFor="">CTCNo</label>
                             <input type="text" className="w-full p-2 border border-gray-600 rounded-md" name="CTCNo" value={additionalData.CTCNo} onChange={handleQueryChange} placeholder="CTC Number"/>
                             
