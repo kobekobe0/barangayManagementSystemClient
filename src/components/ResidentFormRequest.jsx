@@ -81,7 +81,8 @@ const forms = [
     },
 ]
 
-const withPurpose = ['BRC']
+const withPurpose = ['BRC','BC', 'CH']
+const withImg = ['BRC', 'SLP', 'WP', 'BC', "TODA"]
 
 const FormCard = ({form, open}) => {
     return (
@@ -141,7 +142,25 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
         placeIssued: 'Pandi, Bulacan',
         dateIssued: '',
         purpose: '',
-        yrsOfResidency: resident?.yrsOfResidency
+        yrsOfResidency: resident?.yrsOfResidency,
+        coHabitation: {
+            resident1: '',
+            resident2: '',
+            dateOfCoHabitation: '',
+            blotterEntryNumber: '',
+            dateOfBlotter: '',
+            numberOfChildren: 0
+        },
+        TODA: {
+            model: '',
+            motorNumber: '',
+            chassisNumber: '',
+            plateNumber: '',
+        },
+        employment: {
+            position: '',
+            dateLastEmployed: '',
+        }
     })
 
     const setDateToNow = () => {
@@ -164,10 +183,23 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
     }, [resident])
 
     const handleChangeData = (e) => {
-        setAdditionalData({
-            ...additionalData,
-            [e.target.name]: e.target.value
-        })
+        const { name, value } = e.target;
+        const keys = name.split('.');
+        
+        if (keys.length > 1) {
+            setAdditionalData(prevData => ({
+                ...prevData,
+                [keys[0]]: {
+                    ...prevData[keys[0]],
+                    [keys[1]]: value
+                }
+            }));
+        } else {
+            setAdditionalData(prevData => ({
+                ...prevData,
+                [name]: value
+            }));
+        }
     }
 
     const handleChangeFormType = (e) => {
@@ -191,10 +223,10 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
 
     const handleGenerate = async () => {
         //check for values
-        if(!additionalData.dateIssued) {
-            toast.error('Please input a date issued');
-            return;
-        }
+        // if(!additionalData.dateIssued) {
+        //     toast.error('Please input a date issued');
+        //     return;
+        // }
 
         const isConfirmed = await confirm('Are you sure you want to generate this document?');
         if (!isConfirmed) return;
@@ -208,7 +240,9 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
             formType: formType,
             formName: 'Business Clearance',
             residentID: id,
-            yrsOfResidency: additionalData.yrsOfResidency
+            yrsOfResidency: additionalData.yrsOfResidency,
+            coHabitation: additionalData.coHabitation.resident1 !== '' ? additionalData.coHabitation : null,
+            TODA: additionalData.TODA.model !== '' ? additionalData.TODA : null
         }
 
         try{
@@ -240,8 +274,13 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                 }
                 <div className="flex my-2 justify-between gap-4">
                     <select name="form" className="border p-2 w-5/6 rounded-md"  value={formType} onChange={handleChangeFormType}>
+                        <option value="BC">Barangay Clearance</option>
                         <option value="BRC">Certification of Residency</option>
                         <option value="SLP">Solo Parent Certification</option>
+                        <option value="WP">Water Permit Certification</option>
+                        <option value="CH">Co-Habitation Certification</option>
+                        <option value="TODA">TODA Clearance</option>
+                        <option value="UEC">Unemployment Certification</option>
                         <option value="">Select Form Type</option>
                     </select>
                     <button onClick={handleGenerate} className={`${formType == '' || resident?.isBlocked ? 'bg-green-300' : 'bg-green-500'}  text-white p-2 rounded-md w-1/6`} disabled={formType == '' || resident?.isBlocked}>Generate Form</button>
@@ -249,7 +288,60 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                 {
                     formType !== '' && (
                         <div className="flex w-full flex-col">
-                            <p className="text-orange-500 text-sm font-medium">This form needs resident's Image. Make sure that the resident has an image before generating.</p>
+                            {
+                                withImg.includes(formType) && <p className="text-orange-500 text-sm font-medium">This form needs resident's Image. Make sure that the resident has an image before generating.</p>
+                            }
+                            {
+                                formType === 'CH' && (
+                                    <>
+                                        <label className="text-sm font-medium mt-2">Resident 1</label>
+                                        <input type="text" name="coHabitation.resident1" onChange={handleChangeData} value={additionalData.coHabitation.resident1 || ''} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    
+                                        <label className="text-sm font-medium mt-2">Resident 2</label>
+                                        <input type="text" name="coHabitation.resident2" onChange={handleChangeData} value={additionalData.coHabitation.resident2 || ''} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Date of Cohabitation</label>
+                                        <input type="date" name="coHabitation.dateOfCoHabitation" onChange={handleChangeData} value={additionalData.coHabitation.dateOfCoHabitation || ''} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Blotter Entry Number</label>
+                                        <input type="text" name="coHabitation.blotterEntryNumber" onChange={handleChangeData} value={additionalData.coHabitation.blotterEntryNumber || ''} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Date of Blotter</label>
+                                        <input type="date" name="coHabitation.dateOfBlotter" onChange={handleChangeData} value={additionalData.coHabitation.dateOfBlotter || ''} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Number of Children</label>
+                                        <input type="number" name="coHabitation.numberOfChildren" onChange={handleChangeData} value={additionalData.coHabitation.numberOfChildren} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    </>
+                                )
+                            }
+                            {
+                                formType === 'UEC' && (
+                                    <>
+                                        <label className="text-sm font-medium mt-2">Position</label>
+                                        <input type="text" name="employment.position" onChange={handleChangeData} value={additionalData.employment.position} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Date Last Employed</label>
+                                        <input type="date" name="employment.dateLastEmployed" onChange={handleChangeData} value={additionalData.employment.dateLastEmployed} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    </>
+                                )
+                            }
+                            {
+                                formType === 'TODA' && (
+                                    <>
+                                        <label className="text-sm font-medium mt-2">Model</label>
+                                        <input type="text" name="TODA.model" onChange={handleChangeData} value={additionalData.TODA.model} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Motor Number</label>
+                                        <input type="text" name="TODA.motorNumber" onChange={handleChangeData} value={additionalData.TODA.motorNumber} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Chassis Number</label>
+                                        <input type="text" name="TODA.chassisNumber" onChange={handleChangeData} value={additionalData.TODA.chassisNumber} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Plate Number</label>
+                                        <input type="text" name="TODA.plateNumber" onChange={handleChangeData} value={additionalData.TODA.plateNumber} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    </>
+                                )
+                            }
                             {
                                 withPurpose.includes(formType) && (
                                     <>
@@ -259,17 +351,18 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                                 )
                             }
 
-                            <label className="text-sm font-medium mt-2">Date Issued</label>
-                            <div className="flex items-center gap-2 w-full">
-                                <input type="date" name="dateIssued" onChange={handleChangeData} value={additionalData.dateIssued} className=" w-5/6 p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
-                                <button onClick={setDateToNow} className="bg-blue-500 p-2 text-white rounded-md w-1/6">Set Date to Now</button>
-                            </div>
 
                             <label className="text-sm font-medium mt-2">Place Issued</label>
                             <input type="text" name="placeIssued" onChange={handleChangeData} value={additionalData.placeIssued} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
 
                             <label className="text-sm font-medium mt-2">CTCNo</label>
                             <input type="text" name="CTCNo" onChange={handleChangeData} value={additionalData.CTCNo} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                            
+                            <label className="text-sm font-medium mt-2">CTC Date</label>
+                            <div className="flex items-center gap-2 w-full">
+                                <input type="date" name="dateIssued" onChange={handleChangeData} value={additionalData.dateIssued} className=" w-5/6 p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                <button onClick={setDateToNow} className="bg-blue-500 p-2 text-white rounded-md w-1/6">Set Date to Now</button>
+                            </div>
 
                             <label className="text-sm font-medium mt-2">ORNo</label>
                             <input type="text" name="ORNo" onChange={handleChangeData} value={additionalData.ORNo} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
