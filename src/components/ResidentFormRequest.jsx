@@ -160,6 +160,12 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
         employment: {
             position: '',
             dateLastEmployed: '',
+            companyName: '',
+            location: '',
+        },
+        ITR: {
+            incomeMin: 0,
+            incomeMax: 0,
         }
     })
 
@@ -241,8 +247,10 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
             formName: 'Business Clearance',
             residentID: id,
             yrsOfResidency: additionalData.yrsOfResidency,
-            coHabitation: additionalData.coHabitation.resident1 !== '' ? additionalData.coHabitation : null,
-            TODA: additionalData.TODA.model !== '' ? additionalData.TODA : null
+            coHabitation: formType == 'CH' ? additionalData.coHabitation : null,
+            TODA: formType == 'TODA' ? additionalData.TODA : null,
+            employment: formType == 'UEC' || formType == 'EC' ? additionalData.employment : null,
+            ITR: formType == 'ITR' ? additionalData.ITR : null
         }
 
         try{
@@ -280,7 +288,9 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                         <option value="WP">Water Permit Certification</option>
                         <option value="CH">Co-Habitation Certification</option>
                         <option value="TODA">TODA Clearance</option>
+                        <option value="EC">Employment Certification</option>
                         <option value="UEC">Unemployment Certification</option>
+                        <option value="ITR">ITR Exemption Certification</option>
                         <option value="">Select Form Type</option>
                     </select>
                     <button onClick={handleGenerate} className={`${formType == '' || resident?.isBlocked ? 'bg-green-300' : 'bg-green-500'}  text-white p-2 rounded-md w-1/6`} disabled={formType == '' || resident?.isBlocked}>Generate Form</button>
@@ -326,6 +336,20 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                                 )
                             }
                             {
+                                formType === 'EC' && (
+                                    <>
+                                        <label className="text-sm font-medium mt-2">Position</label>
+                                        <input type="text" name="employment.position" onChange={handleChangeData} value={additionalData.employment.position} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Company Name</label>
+                                        <input type="text" name="employment.companyName" onChange={handleChangeData} value={additionalData.employment.companyName} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Location</label>
+                                        <input type="text" name="employment.location" onChange={handleChangeData} value={additionalData.employment.location} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    </>
+                                )
+                            }
+                            {
                                 formType === 'TODA' && (
                                     <>
                                         <label className="text-sm font-medium mt-2">Model</label>
@@ -339,6 +363,17 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
 
                                         <label className="text-sm font-medium mt-2">Plate Number</label>
                                         <input type="text" name="TODA.plateNumber" onChange={handleChangeData} value={additionalData.TODA.plateNumber} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    </>
+                                )
+                            }
+                            {
+                                formType === 'ITR' && (
+                                    <>
+                                        <label className="text-sm font-medium mt-2">Income Min</label>
+                                        <input type="number" name="ITR.incomeMin" onChange={handleChangeData} value={additionalData.ITR.incomeMin} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Income Max</label>
+                                        <input type="number" name="ITR.incomeMax" onChange={handleChangeData} value={additionalData.ITR.incomeMax} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
                                     </>
                                 )
                             }
