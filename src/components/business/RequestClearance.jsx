@@ -34,11 +34,6 @@ const RequestClearance = ({ business, title, setOpen }) => {
     }
 
     const handleGenerate = async () => {
-        //check for values
-        if(!additionalData.dateIssued) {
-            toast.error('Please input a date issued');
-            return;
-        }
 
         const isConfirmed = await confirm('Are you sure you want to generate this document?');
         if (!isConfirmed) return;
