@@ -6,83 +6,9 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import toast from "react-hot-toast"
 
-const forms = [
-    {
-        residentID: 1,
-        _id: 1,
-        formType: 'BC',
-        formName: 'Barangay Clearance',
-        OTCNo: '123456789',
-        ORNo: '987654321',
-        dateIssued: new Date('2021-01-01'),
-        placeIssued: 'Cacarong Matanda, Pandi',
-        purpose: 'Enrollment',
-        formNumber: 'BC-0000123',
-    },
-    {
-        residentID: 1,
-        _id: 2,
-        formType: 'BC',
-        formName: 'Barangay Clearance',
-        OTCNo: '123456789',
-        ORNo: '987654321',
-        dateIssued: new Date('2021-01-01'),
-        placeIssued: 'Cacarong Matanda, Pandi',
-        purpose: 'Enrollment',
-        formNumber: 'BC-0000123',
-    },
-    {
-        residentID: 1,
-        _id: 3,
-        formType: 'BC',
-        formName: 'Business Clearance',
-        OTCNo: '123456789',
-        ORNo: '987654321',
-        dateIssued: new Date('2021-01-01'),
-        placeIssued: 'Cacarong Matanda, Pandi',
-        purpose: 'Enrollment',
-        formNumber: 'BC-0000123',
-    },
-    {
-        residentID: 1,
-        _id: 4,
-        formType: 'BC',
-        formName: 'Barangay Clearance',
-        OTCNo: '123456789',
-        ORNo: '987654321',
-        dateIssued: new Date('2021-01-01'),
-        placeIssued: 'Cacarong Matanda, Pandi',
-        purpose: 'Enrollment',
-        formNumber: 'BC-0000123',
-    },
-    {
-        residentID: 1,
-        _id: 5,
-        formType: 'BC',
-        formName: 'Business Clearance',
-        OTCNo: '123456789',
-        ORNo: '987654321',
-        dateIssued: new Date('2021-01-01'),
-        placeIssued: 'Cacarong Matanda, Pandi',
-        purpose: 'Enrollment',
-        formNumber: 'BC-0000123',
-    },
-    {
-        residentID: 1,
-        _id: 5,
-        formType: 'BC',
-        formName: 'Business Clearance',
-        OTCNo: '123456789',
-        ORNo: '987654321',
-        dateIssued: new Date('2021-01-01'),
-        placeIssued: 'Cacarong Matanda, Pandi',
-        purpose: 'Enrollment',
-        formNumber: 'BC-0000123',
-    },
-]
-
-const withPurpose = ['BRC','BC', 'CH']
-const withImg = ['BRC', 'SLP', 'WP', 'BC', "TODA"]
+const withPurpose = ['BRC','BC', 'CH', 'IC']
+const withImg = ['BRC', 'SLP', 'WP', 'BC', "TODA", 'IC']
+const withLocation = ['ECC', 'EX', 'FC', 'BDC']
 
 const FormCard = ({form, open}) => {
     return (
@@ -99,7 +25,7 @@ const FormCard = ({form, open}) => {
             </div>
             <div>
                 <span className="text-sm font-semibold text-gray-500">
-                    {form.dateIssued.toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    {new Date(form.formDateIssued).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </span>
             </div>
         </div>
@@ -128,12 +54,36 @@ const BusinessCard = ({business}) => {
         </Link>
     )
 }
+const IndigentCard = ({indigent}) => {
+    return (
+        <div className="w-full hover:bg-gray-200 transition-all rounded-md border border-b my-2 p-4 flex justify-between items-center cursor-pointer">
+            <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4">
+                    <p className="text-md font-medium">
+                        {indigent?.recommendation}
+                    </p>
+                    <p className="font-normal text-gray-700">
+                        {indigent.amount && indigent.amount.toLocaleString('en-US', {style: 'currency', currency: 'PHP'})}
+                    </p>
+                </div>
+            </div>
+            <div className="flex items-center gap-4">
+                <span className="text-sm font-semibold text-gray-500">
+                    {indigent?.approvedAt ? new Date(indigent?.approvedAt).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
+                </span>
+            </div>
+        </div>
+    )
+}
 
 const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
     const [activeForm, setActiveForm] = useState(null)
+    const [forms, setForms] = useState([])
     const [businesses, setBusinesses] = useState([])
     const [formType, setFormType] = useState('')
     const [formDisplay, setFormDisplay] = useState('');
+    const [formTypeQuery, setFormTypeQuery] = useState('')
+    const [indigentHistory, setIndigentHistory] = useState([])
 
 
     const [additionalData, setAdditionalData] = useState({
@@ -166,7 +116,12 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
         ITR: {
             incomeMin: 0,
             incomeMax: 0,
-        }
+        },
+        indigency: {
+            beneficiaryName: '',
+            relationToBeneficiary: '',
+        },
+        location: ''
     })
 
     const setDateToNow = () => {
@@ -222,9 +177,40 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
         }
     }
 
+    const fetchForms = async () => {
+        try {
+            //format the query
+            //dd formTypeQuery to the query
+            let query = `form/resident/${id}`
+            query += formTypeQuery ? `?formType=${formTypeQuery}` : ''
+
+
+            const {data} = await axios.get(`${API_URL}${query}`)
+            setForms(data.data)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const fetchIndigentHistory = async () => {
+        try {
+            const {data} = await axios.get(`${API_URL}indigent/resident/${id}`)
+            console.log(data)
+            setIndigentHistory(data.data)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     useEffect(() => {
         fetchBusinesses()
+        fetchForms()
+        fetchIndigentHistory()
     }, [id])
+
+    useEffect(() => {
+        fetchForms()
+    }, [formTypeQuery])
 
 
     const handleGenerate = async () => {
@@ -244,13 +230,19 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
             CTCNo: additionalData.CTCNo,
             ORNo: additionalData.ORNo,
             formType: formType,
-            formName: 'Business Clearance',
+            formName: formDisplay,
             residentID: id,
             yrsOfResidency: additionalData.yrsOfResidency,
             coHabitation: formType == 'CH' ? additionalData.coHabitation : null,
             TODA: formType == 'TODA' ? additionalData.TODA : null,
             employment: formType == 'UEC' || formType == 'EC' ? additionalData.employment : null,
-            ITR: formType == 'ITR' ? additionalData.ITR : null
+            ITR: formType == 'ITR' ? additionalData.ITR : null,
+            fileIsRequired: false,
+            electrical: formType == 'ECC' ? {location: additionalData.location} : null,
+            excavation: formType == 'EX' ? {location: additionalData.location} : null,
+            fencing: formType == 'FC' ? {location: additionalData.location} : null,
+            building: formType == 'BDC' ? {location: additionalData.location} : null,
+            indigency: formType == 'IC' ? additionalData.indigency : null
         }
 
         try{
@@ -283,6 +275,7 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                 <div className="flex my-2 justify-between gap-4">
                     <select name="form" className="border p-2 w-5/6 rounded-md"  value={formType} onChange={handleChangeFormType}>
                         <option value="BC">Barangay Clearance</option>
+                        <option value="IC">Certification of Indigency</option>
                         <option value="BRC">Certification of Residency</option>
                         <option value="SLP">Solo Parent Certification</option>
                         <option value="WP">Water Permit Certification</option>
@@ -291,6 +284,10 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                         <option value="EC">Employment Certification</option>
                         <option value="UEC">Unemployment Certification</option>
                         <option value="ITR">ITR Exemption Certification</option>
+                        <option value="ECC">Electrical Clearance</option>
+                        <option value="EX">Excavation Clearance</option>
+                        <option value="FC">Fencing Clearance</option>
+                        <option value="BDC">Building Clearance</option>
                         <option value="">Select Form Type</option>
                     </select>
                     <button onClick={handleGenerate} className={`${formType == '' || resident?.isBlocked ? 'bg-green-300' : 'bg-green-500'}  text-white p-2 rounded-md w-1/6`} disabled={formType == '' || resident?.isBlocked}>Generate Form</button>
@@ -300,6 +297,14 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                         <div className="flex w-full flex-col">
                             {
                                 withImg.includes(formType) && <p className="text-orange-500 text-sm font-medium">This form needs resident's Image. Make sure that the resident has an image before generating.</p>
+                            }
+                            {
+                                withLocation.includes(formType) && (
+                                    <>
+                                        <label className="text-sm font-medium mt-2">Location</label>
+                                        <input type="text" name="location" onChange={handleChangeData} value={additionalData.location} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    </>
+                                )
                             }
                             {
                                 formType === 'CH' && (
@@ -332,6 +337,17 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
 
                                         <label className="text-sm font-medium mt-2">Date Last Employed</label>
                                         <input type="date" name="employment.dateLastEmployed" onChange={handleChangeData} value={additionalData.employment.dateLastEmployed} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    </>
+                                )
+                            }
+                            {
+                                formType === 'IC' && (
+                                    <>
+                                        <label className="text-sm font-medium mt-2">Requested By</label>
+                                        <input type="text" name="indigency.beneficiaryName" onChange={handleChangeData} value={additionalData.indigency.beneficiaryName} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Relation to Beneficiary</label>
+                                        <input type="text" name="indigency.relationToBeneficiary" onChange={handleChangeData} value={additionalData.indigency.relationToBeneficiary} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
                                     </>
                                 )
                             }
@@ -412,19 +428,42 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
             <div className="flex flex-col p-8 w-full h-fit shadow-lg ">
                 <div className="overflow-y-auto mt-8">
                     <div className="flex justify-between items-center mb-8">
-                        <h3 className="font-medium text-gray-600">Form Requests History (90)</h3>
+                        <h3 className="font-medium text-gray-600">Form Requests History ({forms.length})</h3>
                         <div className="flex items-center gap-4">
                             <p>sort by: </p>
-                            <select name="form" className="border p-1">
-                                <option value="">Select Form Type</option>
-                                <option value="BRC">Certification of Residency</option>
+                            <select name="form" className="border p-1" value={formTypeQuery} onChange={e => setFormTypeQuery(e.target.value)}>
+                                <option value="">All Form Type</option>
+                                <option value="BC">Barangay Clearance</option>
+                                <option value="BDC">Building Clearance</option>
+                                <option value="BRC">Certificate of Residency</option>
+                                <option value="BSC">Business Clearance</option>
+                                <option value="CL">Calamity Loan</option>
+                                <option value="CB">Closed Business</option>
+                                <option value="CH">Co-Habitation Certification</option>
+                                <option value="ECC">Electrical Clearance</option>
+                                <option value="EC">Employment Clearance</option>
+                                <option value="EX">Excavation Clerance</option>
+                                <option value="FC">Fencing Clearance</option>
+                                <option value="IC">Indigency Certification</option>
+                                <option value="ITR">ITR Exemption</option>
+                                <option value="LBC">Late BC Registration</option>
+                                <option value="LB">Lipat Bahay</option>
+                                <option value="MC">Medical Certification</option>
+                                <option value="NRC">Non-Resident Certification</option>
+                                <option value="PAO">PAO Certification</option>
+                                <option value="RC">Reconstruction Clearance</option>
+                                <option value="SLP">Solo Parent Certification</option>
+                                <option value="TODA">TODA Certification</option>
+                                <option value="UEC">Unemployment Certification</option>
+                                <option value="WP">Water Permit</option>
+                                <option value="ZC">oning Clearance</option>
                             </select>
                         </div>
                     </div>
                     <div className="h-[30vh] overflow-y-auto flex flex-col">
                         {
                             forms.map(form => (
-                                <FormCard form={form} key={form._id} open={()=>setActiveForm(form._id)}/>
+                                <FormCard form={form} key={form._id} open={()=>setActiveForm(form)}/>
                             ))
                         }
                     </div>
@@ -434,7 +473,7 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                 </div>
             </div>
 
-            <div className="flex flex-col p-8 w-full h-fit shadow-lg ">
+            <div className="flex flex-colw-full h-fit shadow-lg ">
                 <div className="flex flex-col p-8 w-full h-fit shadow-lg fit">
                     <div className="flex my-4 justify-between gap-4">
                         <h3 className="font-semibold text-lg text-gray-700">Business</h3>
@@ -444,7 +483,7 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                     <div className="flex flex-col w-full items-center">
                         {
                             businesses.map(business => (
-                                <BusinessCard business={business} key={business.plateNumber}/>
+                                <BusinessCard business={business} key={business._id}/>
                             ))
                         }
                     </div>  
@@ -458,8 +497,8 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                 </div>
                 <div className="flex flex-col w-full items-center">
                     {
-                        businesses.map(business => (
-                            <BusinessCard business={business} key={business.plateNumber}/>
+                        indigentHistory.map(indigent => (
+                            <IndigentCard indigent={indigent} key={indigent._id}/>
                         ))
                     }
                 </div>  

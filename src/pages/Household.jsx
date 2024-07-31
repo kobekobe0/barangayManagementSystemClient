@@ -101,10 +101,16 @@ const Household = () => {
     })
 
     const handleAddFamily = async () => {
-        setFamilies([...families, {
-            _id: `tempID-${Math.floor(Math.random() * 1000000)}`,
-            members: []
-        }])
+        try {
+            const {data} = await axios.post(`${API_URL}census/family/create/${householdId}`)
+            console.log(data.data)
+            setFamilies([...families, {
+                _id: data.data._id,
+                members: []
+            }])
+        } catch (error) {
+            console.error(error.message)
+        }
     }
 
     const handleAddFamilyMember = (familyID) => {
@@ -174,6 +180,7 @@ const Household = () => {
         let dataToSubmit = {
             member,
             address: household.address,
+            householdID: household._id
         }
         prepareData(dataToSubmit)
 
@@ -217,12 +224,17 @@ const Household = () => {
         }
     };
 
-    const handleRemoveFamily = (familyID) => {
+    const handleRemoveFamily = async (familyID) => {
         // Remove family members based on familyID
         setMembers(members.filter(member => !families.find(family => family._id === familyID).members.includes(member._id)));
 
-        // Remove family based on familyID
-        setFamilies(families.filter(family => family._id !== familyID));
+        try {
+            await axios.delete(`${API_URL}census/family/delete/${familyID}`);
+            setFamilies(families.filter(family => family._id !== familyID));
+        } catch (error) {
+            console.error(error.message);
+            toast.error('Failed to remove family');
+        }
     }
 
     const handleRemoveFamilyMember = (memberID, familyID) => {
@@ -301,6 +313,20 @@ const Household = () => {
         }));
     }, []);
 
+    const handleDeleteHousehold = async () => {
+        const isConfirmed = await confirm('Are you sure you want to delete this household?');
+
+        if (!isConfirmed) return;
+
+        try {
+            await axios.delete(`${API_URL}census/household/delete/${householdId}`);
+            toast.success('Household deleted successfully');
+        } catch (error) {
+            console.error(error.message);
+            toast.error('Failed to delete household');
+        }
+    }
+
     useEffect(() => {
         fetchHousehold()
         fetchFamilies()
@@ -312,14 +338,7 @@ const Household = () => {
                 <div className='flex justify-between items-center'>
                     <h2 className='font-semibold text-lg'>Household</h2>
                     <div className="flex items-center gap-2">
-                        <button className='bg-blue-500 text-white rounded-sm px-4 py-1'>Print</button>
-                        {
-                            edit ? (
-                                <button className='bg-blue-500 text-white rounded-sm px-4 py-1' onClick={() => setEdit(false)}>Save</button>
-                            ) : (
-                                <button className='bg-blue-500 text-white rounded-sm px-4 py-1' onClick={() => setEdit(true)}>Edit</button>
-                            )
-                        }
+                        <button onClick={handleDeleteHousehold} className='bg-red-500 text-white rounded-sm px-4 py-1'>Delete Household</button>
                     </div>
                 </div>
                 <div className="mt-4">

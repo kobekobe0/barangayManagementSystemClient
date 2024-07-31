@@ -58,6 +58,7 @@ const CensusFormOne = ({resident, edit, onInputChange, onDateChange}) => {
                         <option value="elementary">Elementary</option>
                         <option value="highschool">Highschool</option>
                         <option value="undergraduate">Undergraduate</option>
+                        <option value="voctional">Vocational</option>
                         <option value="masteral">Masteral</option>
                         <option value="doctorate">Doctorate</option>
                         <option value="">Non</option>
@@ -83,6 +84,7 @@ const CensusFormOne = ({resident, edit, onInputChange, onDateChange}) => {
                         <option value="pwd">PWD</option>
                         <option value="senior">Senior Citizen</option>
                         <option value="solo">Solo Parent</option>
+                        <option value="ofw">OFW</option>
                     </select>
                 </div>
                 <div className="flex flex-col w-[5%]">

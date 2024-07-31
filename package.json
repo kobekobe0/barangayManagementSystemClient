@@ -12,9 +12,11 @@
   "dependencies": {
     "axios": "^1.7.2",
     "braces": "^3.0.3",
+    "chart.js": "^4.4.3",
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-doc-viewer": "^0.1.13",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",

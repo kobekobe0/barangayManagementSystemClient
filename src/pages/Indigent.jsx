@@ -11,12 +11,79 @@ import AddIndigent from "../components/indigent/AddIndigent"
 import EditHolder from "../components/indigent/EditHolder"
 import CreateHolder from "../components/indigent/CreateHolder"
 
+const IndigentHistory = ({setOpen}) => {
+    const [indigentHolders, setIndigentHolders] = useState([])
+    const [selectedHolder, setSelectedHolder] = useState({})
+
+    const fetchIndigentHolders = async () => {
+        try {
+            const {data} = await axios.get(`${API_URL}indigent/holder/all`)
+            setIndigentHolders(data.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const printReport = async (id) => {
+        try {
+            const response = await axios.get(`${API_URL}indigent/print/${id}`, {
+                responseType: 'arraybuffer',
+            });
+    
+            const file = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const fileURL = URL.createObjectURL(file);
+    
+            const link = document.createElement('a');
+            link.href = fileURL;
+            link.download = `indigent_summary_${id}.docx`;
+            link.click();
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchIndigentHolders()
+    },[])
+
+    return (
+        <div className='flex w-full flex-col absolute bg-black bg-opacity-55 left-0 top-0 h-full items-center justify-center'>
+            <div className="items-center justify-center bg-white p-12 flex overflow-y-auto gap-4 rounded-md" >
+                <div className='flex flex-col w-[50vw] rounded-md shadow-lg overflow-y-auto h-fit gap-4'>
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h2 className="font-semibold text-lg">Select Report To Print</h2>
+                            <p>
+                                Below are the list of indigent reports that have received cash assistance. Select a date to print a report.
+                            </p>
+                        </div>
+                        
+                        <button onClick={()=>setOpen(false)} className="bg-red-500 text-white p-2 rounded-md">Close</button>
+                    </div>
+                    
+                    {
+                        indigentHolders.map(holder => (
+                            <button onClick={() => printReport(holder._id)} className="bg-blue-500 text-white text-start px-4 py-2 w-full rounded-md">{new Date(holder.createdAt).toLocaleString('en-us', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: '2-digit'
+                            })}</button>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+    )
+}
+
 const Indigent = () => {
     const [addModal, setAddModal] = useState(false)
     const [editModal, setEditModal] = useState(false)
     const [addHolderModal, setAddHolderModal] = useState(false)
     const [indigentHolder, setIndigentHolder] = useState({})
     const [numbers, setNumbers] = useState({})
+
+    const [printModal, setPrintModal] = useState(false)
 
     const fetchLatestHolder = async () => {
         try {
@@ -37,6 +104,15 @@ const Indigent = () => {
         }
     }
 
+    const printReport = async () => {
+        try {
+            const {data} = await axios.get(`${API_URL}indigent/holder`)
+            setIndigentHolder(data.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         fetchLatestHolder()
     },[])
@@ -52,7 +128,7 @@ const Indigent = () => {
                     <div className='flex flex-col justify-center gap-4'>
                         <div className="flex items-center justify-between">
                             <h2 className='text-lg font-semibold text-gray-600'>Cash Assistance</h2>
-                            <button className="bg-blue-500 text-xs text-white px-2 py-1 rounded-md">Print Report</button>
+                            <button onClick={() => setPrintModal(true)} className="bg-blue-500 text-xs text-white px-2 py-1 rounded-md">Print Report</button>
                         </div>
                         
                         <div className="flex items-center justify-between">
@@ -96,7 +172,13 @@ const Indigent = () => {
                         }
                                     
                     </div>
+                    {
+                        printModal && (
+                            <IndigentHistory setOpen={setPrintModal}/>
+                        )
+                    }
                 </div>
+                
                 <IndigentForms />
             </div>
             {

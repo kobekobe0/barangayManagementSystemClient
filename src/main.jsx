@@ -24,6 +24,7 @@ import BlockLog from './pages/BlockLogs'
 import CedulaItem from './pages/CedulaItem'
 import Temp from './pages/Temp'
 import Forms from './pages/Forms'
+import Borrow from './pages/Borrow'
 
 const router = createBrowserRouter([
   {
@@ -86,6 +87,10 @@ const router = createBrowserRouter([
       {
         path: 'forms',
         element: <Forms />
+      },
+      {
+        path: 'borrow',
+        element: <Borrow />
       }
     ]
   },

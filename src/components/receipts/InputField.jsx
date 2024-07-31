@@ -7,7 +7,7 @@ const InputField = React.memo(({ label, value, onChange, width, editable }) => {
   return (
     <input
       className={`${width} border px-2 py-1 text-lg ${label == 'Amount' ? value <= 0 ? 'font-normal text-gray-600' : 'font-medium' : ''}`}
-      type="text"
+      type={label === 'Amount' ? 'number' : 'text'}
       placeholder={label}
       onChange={onChange}
       value={value || ''} // Set default value if undefined

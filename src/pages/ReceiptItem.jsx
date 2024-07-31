@@ -130,6 +130,45 @@ const ReceiptItem = () => {
         }
     }
 
+    const printReport = async () => {
+
+        if(!isSaved) return toast.error('Please save the report first')
+
+        try {
+            const response = await axios.get(`${API_URL}receipt/print/${id}`, {
+                responseType: 'arraybuffer',
+            });
+    
+            const file = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const fileURL = URL.createObjectURL(file);
+    
+            const link = document.createElement('a');
+            link.href = fileURL;
+            link.download = `${booklet.bookletNumber}.docx`;
+            link.click();
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleDelete = async () => {
+        const isConfirmed = await confirm('Are you sure you want to delete this report?')
+        if (!isConfirmed) return
+
+        try {
+            const {data} = await axios.delete(`${API_URL}receipt/${id}`)
+            console.log(data)
+            toast.success('Report deleted successfully')
+            setTimeout(() => {
+                window.location.href = '/receipts'
+            }, 2000)
+        } catch (error) {
+            console.log(error)
+            toast.error('Failed to delete report')
+        }
+    }
+
     if (!booklet) {
         return <div>Loading...</div>
     }
@@ -158,12 +197,12 @@ const ReceiptItem = () => {
                         </h2>
                     </div>
                     <button className={`bg-green-500 text-white p-2 rounded-md mt-8 hover:bg-green-600 transition-all ${isSaved && 'opacity-55'}`} onClick={handleSave} disabled={isSaved}>Save Report</button>
-                    <button className="bg-blue-500 text-white p-2 rounded-md mt-8 hover:bg-blue-600 transition-all">Print Report</button>
-                    <button className=" text-red-400 border border-red-400 p-2 rounded-md mt-8 hover:bg-red-400 hover:text-white transition-all">Delete Booklet Entry</button>
+                    <button onClick={printReport} className="bg-blue-500 text-white p-2 rounded-md mt-8 hover:bg-blue-600 transition-all" >Print Report</button>
+                    <button onClick={handleDelete} className=" text-red-400 border border-red-400 p-2 rounded-md mt-8 hover:bg-red-400 hover:text-white transition-all">Delete Booklet Entry</button>
                 </div>
                 <div className="flex shadow-lg mb-4 flex-col p-8 w-full">
                     <div className="flex flex-col flex-wrap gap-2 w-full">
-                        <p className="text-sm text-gray-700">Add Year to Date Fields</p>
+                        <p className="text-sm text-gray-700">Add Year to Empty Date Fields</p>
                         <div className="w-full">
                             <input className="border p-2 w-4/5" type="number" value={yearToAdd} onChange={(e) => setYearToAdd(e.target.value)} />
                             <button className="bg-green-500 w-1/5 text-white p-2 mt-2 hover:bg-green-600 transition-all" onClick={addYearToDateFields}>Insert</button>

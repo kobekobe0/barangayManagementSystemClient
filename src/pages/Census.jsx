@@ -5,21 +5,12 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import API_URL from "../constants/api";
 import censuspic from "../assets/census.jpg";
+import CensusReport from "../components/CensusReport";
 
 const CensusCard = ({census}) => {
     return (
-        <Link to={`${census._id}`} className="w-fit mx-4 hover:bg-gray-200 transition-all hover:scale-105 rounded-lg border border-b my-4 flex justify-between flex-col items-center cursor-pointer relative gap-4">
-            <div className="flex items-center gap-4 overflow-hidden">
-                <img src={censuspic} alt="" className="filter blur-xs brightness-75 rounded-lg w-[20em]" />
-            </div>
-            <div className="absolute inset-0 flex justify-center items-center flex-col hover:bg-black hover:opacity-85 rounded-lg transition-all">
-                <h1 className="text-6xl mb-2 font-bold text-white">
-                    {new Date(census.createdAt).toLocaleDateString('en-US', { year: 'numeric' })}
-                </h1>
-                <span className="text-xl  text-white">
-                    {new Date(census.createdAt).toLocaleDateString('en-US', {month: 'long', day: 'numeric' })}
-                </span>
-            </div>
+        <Link to={`${census._id}`}>
+            Census Households
         </Link>
 
     )
@@ -76,6 +67,18 @@ const Census = () => {
         }
     }
 
+    const updateCensus = async () => {
+        try {
+            await axios.post(`${API_URL}censusReport`)
+            toast.success('Census updated successfully')
+            setTimeout(() => {
+                window.location.reload()
+            }, 1000)
+        } catch (error) {
+            toast.error(error.response.data.message)
+        }
+    }
+
     useEffect(() => {
         fetchCensus()
     }, [])
@@ -83,14 +86,23 @@ const Census = () => {
         <div className="flex p-8 flex-col ml-64 w-full">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-semibold">Census</h1>
-                <button onClick={()=>setAddModal(true)} className="bg-green-500 text-white px-4 py-1 rounded-sm">Add Census</button>
+                <div className="flex items-center gap-4">
+                    <button onClick={updateCensus} className="text-sm border text-yellow-500 p-2 hover:bg-yellow-500 hover:text-white rounded-md duration-75 transition-all border-yellow-500">
+                        Update Census
+                    </button>
+                    {
+                        !data.length > 0 ? ( <button onClick={()=>setAddModal(true)} className="bg-green-500 text-white px-4 py-1 rounded-sm">Add Census</button> ) :
+                            (
+                                <Link to={`${data[0]._id}`} className="bg-blue-500 text-white px-2 py-2 rounded-md text-sm">
+                                    Census Households
+                                </Link>
+                            )
+                    }
+                </div>
+
             </div>
             <div className="flex w-full mt-8 flex-wrap">
-                {
-                    data?.map((census, index) => (
-                        <CensusCard key={index} census={census}/>
-                    ))
-                }
+                <CensusReport />
             </div>
             {
                 addModal && <AddModal onClose={() => setAddModal(false)}/>

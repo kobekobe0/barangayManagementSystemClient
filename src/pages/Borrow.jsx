@@ -4,32 +4,32 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../constants/api";
 import ResidentSelector from "../components/business/ResidentSelector";
-import AddForm from "../components/forms/AddForm";
+import AddForm from "../components/borrow/AddForm";
 import ResidentFormModal from "../components/residents/ResidentFormModal";
 
 const BusinessItem = ({ business, setOpenForm }) => {
     return (
         <div onClick={setOpenForm} className="border flex gap-4 p-4 w-full justify-between items-center mb-4 rounded-lg hover:bg-gray-200 cursor-pointer">
             <div className="flex flex-col justify-center">
-                <p className="font-medium text-gray-800 text-xl flex items-center gap-4">{business?.formName || ''}</p>
+                <p className="font-medium text-gray-800 text-xl flex items-center gap-4">{business?.vehicle || ''}</p>
                 {
                     business?.isResident ? (
-                        <p className=" text-gray-500 text-md flex items-center gap-2">{business?.residentID?.name?.last}, {business?.residentID?.name?.first} {business?.residentID?.name?.middle} {business?.residentID?.name?.suffix} <span className="text-sm font-normal"> - {business?.formNumber}</span></p>
+                        <p className=" text-gray-500 text-md flex items-center gap-2">{business?.residentID?.name?.last}, {business?.residentID?.name?.first} {business?.residentID?.name?.middle} {business?.residentID?.name?.suffix} <span className="text-sm font-normal"> - {business?.placeWent}</span></p>
 
                     ) : (
-                        <p className=" text-gray-500 text-md flex items-center gap-2">{business?.nonResident?.name?.last}, {business?.nonResident?.name?.first} {business?.nonResident?.name?.middle} {business?.nonResident?.name?.suffix} <span className="text-sm font-normal"> - {business?.formNumber}</span></p>
+                        <p className=" text-gray-500 text-md flex items-center gap-2">{business?.nonResident?.name?.last}, {business?.nonResident?.name?.first} {business?.nonResident?.name?.middle} {business?.nonResident?.name?.suffix} <span className="text-sm font-normal"> - {business?.placeWent}</span></p>
                     )
                 }
             </div>
             <div className="flex items-center gap-2">
-                <p>{business?.formDateIssued ? new Date(business?.formDateIssued).toLocaleDateString('en-us', {year:'numeric', month: 'long', day:'2-digit'}) : ''}</p>
+                <p>{business?.dateBorrowed ? new Date(business?.dateBorrowed).toLocaleDateString('en-us', {year:'numeric', month: 'long', day:'2-digit', hour: '2-digit', minute: '2-digit'}) : ''}</p>
             </div>
         </div>
     )
 }
 
 
-const Forms = () => {
+const Borrow = () => {
     const [openModal, setOpenModal] = useState(false)
     const [businesses, setBusinesses] = useState([])
     const [openForm, setOpenForm] = useState(null)
@@ -37,8 +37,7 @@ const Forms = () => {
         first: '',
         middle: '',
         last: '',
-        formType: '',
-        formNumber: '',
+        vehicle: '',
     })
     const [statistics, setStatistics] = useState({
         activeBusinesses: 0,
@@ -63,16 +62,10 @@ const Forms = () => {
     const fetchForms = useCallback(async () => {
         try {
             const copy = { ...latestSearch.current };
-            //check if formType is empty
-            if (copy.formType === "") {
-                delete copy.formType;
-            }
-
             const params = new URLSearchParams(copy).toString();
-
-            const response = await axios.get(`${API_URL}form?${params}`);
-            console.log(response.data.data)
-            setBusinesses(response.data.data);
+            const response = await axios.get(`${API_URL}borrow?${params}`);
+            //console.log(response.data.data)
+            setBusinesses(response.data.borrows);
         } catch (error) {
             console.log(error);
         }
@@ -101,42 +94,19 @@ const Forms = () => {
             </div>
             <div className="shadow-lg flex w-3/5">
                 <div className="flex flex-col p-8 w-full">
-                    <h2 className="text-lg font-medium my-4">Forms Released</h2>
+                    <h2 className="text-lg font-medium my-4">Vehicle Usage History</h2>
                     <hr className="mb-4"/>
                     <div className="flex gap-4 items-center justify-between w-full">
                         
-                        <select name="formType" id="filter" className="p-2 border w-1/4" value={searchQuery?.formType} onChange={handleQueryChange}>
-                            <option value="">All Form Type</option>
-                            <option value="BC">Barangay Clearance</option>
-                            <option value="BDC">Building Clearance</option>
-                            <option value="BRC">Certificate of Residency</option>
-                            <option value="BSC">Business Clearance</option>
-                            <option value="CL">Calamity Loan</option>
-                            <option value="CB">Closed Business</option>
-                            <option value="CH">Co-Habitation Certification</option>
-                            <option value="ECC">Electrical Clearance</option>
-                            <option value="EC">Employment Clearance</option>
-                            <option value="EX">Excavation Clerance</option>
-                            <option value="FC">Fencing Clearance</option>
-                            <option value="IC">Indigency Certification</option>
-                            <option value="ITR">ITR Exemption</option>
-                            <option value="LBC">Late BC Registration</option>
-                            <option value="LB">Lipat Bahay</option>
-                            <option value="MC">Medical Certification</option>
-                            <option value="NRC">Non-Resident Certification</option>
-                            <option value="PAO">PAO Certification</option>
-                            <option value="RC">Reconstruction Clearance</option>
-                            <option value="SLP">Solo Parent Certification</option>
-                            <option value="TODA">TODA Certification</option>
-                            <option value="UEC">Unemployment Certification</option>
-                            <option value="WP">Water Permit</option>
-                            <option value="ZC">oning Clearance</option>
+                        <select name="vehicle" id="filter" className="p-2 border w-1/4" value={searchQuery?.vehicle} onChange={handleQueryChange}>
+                            <option value="RescuePatrol">Barangay Rescue Patrol</option>
+                            <option value="Ambulance">Barangay Ambulance</option>
+                            <option value="">All</option>
                         </select> 
                         <div className="flex items-center gap-4 w-3/4">
                             <input type="text" placeholder="first name" className="p-2 border w-1/4" name="first" onChange={handleQueryChange} value={searchQuery.first}/>
                             <input type="text" placeholder="middle name" className="p-2 border w-1/4" name="middle" onChange={handleQueryChange} value={searchQuery.middle}/>
                             <input type="text" placeholder="last name" className="p-2 border w-1/4" name="last" onChange={handleQueryChange} value={searchQuery.last}/>
-                            <input type="text" placeholder="form number" className="p-2 border w-1/4" name="formNumber" onChange={handleQueryChange} value={searchQuery.formNumber}/>
                         </div>
                     </div>
                     
@@ -156,7 +126,7 @@ const Forms = () => {
                         }
                         {
                             openForm !== null && (
-                                <ResidentFormModal onClose={() => setOpenForm(null)} form={openForm}/>
+                                <ResidentFormModal print={false} onClose={() => setOpenForm(null)} form={openForm}/>
                             )
                         }
                     </div>
@@ -166,4 +136,4 @@ const Forms = () => {
     )
 }
 
-export default Forms
+export default Borrow
