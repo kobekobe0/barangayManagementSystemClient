@@ -1,6 +1,9 @@
 import React from 'react'
 import swoosh from '../assets/logo.png'
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import API_URL from '../constants/api';
 
 function Sidebar() {
     const navigate = useNavigate();
@@ -63,11 +66,32 @@ function Sidebar() {
         },
     ]
 
-    const onLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        navigate('/signin');
+    const onShutdown = async () => {
+        const isConfirmed = window.confirm('Are you sure you want to shutdown?')
+        if (!isConfirmed) return
+        try{
+            const reponse = await axios.post(`${API_URL}shutdown`)
+            toast.success(reponse.data.message)
+        } catch (error) {
+            toast.error('Failed to shutdown')
+        }
     }
+
+    const onBackup = async () => {
+        const isConfirmed = window.confirm('Are you sure you want to backup? This will take some time to finish.')
+        if (!isConfirmed) return
+        toast.loading('Backing up...')
+        try{
+            const reponse = await axios.post(`${API_URL}backup`)
+            toast.success(reponse.data.message)
+            setTimeout(() => {
+                toast.dismiss()
+            }, 1000)
+        } catch (error) {
+            toast.error('Failed to backup')
+        }
+    }
+
   return (
 <div className='p-4 flex flex-col h-screen bg-emerald-950'>
     <div>
@@ -89,8 +113,10 @@ function Sidebar() {
             ))}
         </ul>
     </div>  
-    <div className='text-center flex justify-center items-end h-full'>
-        <h2 className='text-xs font-medium'>© 2024 | Kobe@Dev</h2>
+    <div className='text-center flex justify-end h-full flex-col'>
+        <button onClick={onBackup} className='bg-emerald-900 mb-4 px-1 p-2 hover:bg-blue-700 duration-105 rounded-sm text-sm transition-all flex items-center justify-center gap-2'><svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="white" d="m19.21 12.04l-1.53-.11l-.3-1.5A5.484 5.484 0 0 0 12 6C9.94 6 8.08 7.14 7.12 8.96l-.5.95l-1.07.11A3.99 3.99 0 0 0 2 14c0 2.21 1.79 4 4 4h13c1.65 0 3-1.35 3-3c0-1.55-1.22-2.86-2.79-2.96m-5.76.96v3h-2.91v-3H8l4-4l4 4z" opacity="0.3"/><path fill="white" d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5c0-2.64-2.05-4.78-4.65-4.96M19 18H6c-2.21 0-4-1.79-4-4c0-2.05 1.53-3.76 3.56-3.97l1.07-.11l.5-.95A5.469 5.469 0 0 1 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5l1.53.11A2.98 2.98 0 0 1 22 15c0 1.65-1.35 3-3 3M8 13h2.55v3h2.9v-3H16l-4-4z"/></svg>Backup</button>
+        <button onClick={onShutdown} className='bg-emerald-900 mb-4 px-1 p-2 hover:bg-red-700 duration-105 rounded-sm text-sm transition-all flex items-center justify-center gap-2'><svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="white" d="m16.56 5.44l-1.45 1.45A5.97 5.97 0 0 1 18 12a6 6 0 0 1-6 6a6 6 0 0 1-6-6c0-2.17 1.16-4.06 2.88-5.12L7.44 5.44A7.96 7.96 0 0 0 4 12a8 8 0 0 0 8 8a8 8 0 0 0 8-8c0-2.72-1.36-5.12-3.44-6.56M13 3h-2v10h2"/></svg>Shutdown</button>
+        <h2 className='text-xs font-medium'>© 2024 | Cacarong Matanda</h2>
     </div>
 </div>
   )
