@@ -69,7 +69,7 @@ function Sidebar() {
         navigate('/signin');
     }
   return (
-<div className='p-4 flex flex-col h-screen bg-green-600'>
+<div className='p-4 flex flex-col h-screen bg-emerald-950'>
     <div>
         <div className='flex items-center mb-8 p-2'>
             <img src={swoosh} alt="logo" width={50} />
@@ -88,10 +88,10 @@ function Sidebar() {
                 </li>
             ))}
         </ul>
+    </div>  
+    <div className='text-center flex justify-center items-end h-full'>
+        <h2 className='text-xs font-medium'>© 2024 | Kobe@Dev</h2>
     </div>
-    <button onClick={onLogout} className='mt-auto hover:bg-red-500 ease-in-out duration-150 text-red-500 hover:text-white font-medium border-red-500 border py-2 px-4 rounded'>
-        Logout
-    </button>
 </div>
   )
 }

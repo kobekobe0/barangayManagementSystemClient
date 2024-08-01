@@ -116,12 +116,11 @@ const AddModal = ({onClose}) => {
         try{
             let dataToSubmit = { ...resident };
             prepareData(dataToSubmit);
-
+            toast.dismiss();
             const {data} = await axios.post(`${API_URL}census/household/create/${id}`, dataToSubmit);
             toast.success(data.message);
-
             window.open(`/census/${id}/${data.data._id}`, '_blank');
-
+            onClose();
         } catch (error) {
             console.error(error);
         }
