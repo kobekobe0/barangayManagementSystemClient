@@ -24,7 +24,7 @@ const ResidentAddModal = ({onClose}) => {
             householdNumber: '',
             sitio: ''
         },
-        sex: '',
+        sex: 'M',
     })
 
     const handleChange = (path, value) => {
