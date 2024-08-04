@@ -121,6 +121,18 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
             beneficiaryName: '',
             relationToBeneficiary: '',
         },
+        lateBC: {
+            father: '',
+            mother: '',
+            fatherOccupation: '',
+            motherOccupation: '',
+            placeOfBirth: '',
+            dateOfBirth: '',
+            religion: '',
+            isMerried: false,
+            nameOfChild: '',
+            school: '',
+        },
         location: ''
     })
 
@@ -242,7 +254,8 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
             excavation: formType == 'EX' ? {location: additionalData.location} : null,
             fencing: formType == 'FC' ? {location: additionalData.location} : null,
             building: formType == 'BDC' ? {location: additionalData.location} : null,
-            indigency: formType == 'IC' ? additionalData.indigency : null
+            indigency: formType == 'IC' ? additionalData.indigency : null,
+            lateBC: formType == 'LBC' ? additionalData.lateBC : null
         }
 
         try{
@@ -288,6 +301,8 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                         <option value="EX">Excavation Clearance</option>
                         <option value="FC">Fencing Clearance</option>
                         <option value="BDC">Building Clearance</option>
+                        <option value="LBC">Late Birth Registration</option>
+                        <option value="FT">First Time Job Seeker</option>
                         <option value="">Select Form Type</option>
                     </select>
                     <button onClick={handleGenerate} className={`${formType == '' || resident?.isBlocked ? 'bg-green-300' : 'bg-green-500'}  text-white p-2 rounded-md w-1/6`} disabled={formType == '' || resident?.isBlocked}>Generate Form</button>
@@ -337,6 +352,40 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
 
                                         <label className="text-sm font-medium mt-2">Date Last Employed</label>
                                         <input type="date" name="employment.dateLastEmployed" onChange={handleChangeData} value={additionalData.employment.dateLastEmployed} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+                                    </>
+                                )
+                            }
+                            {
+                                formType === 'LBC' && (
+                                    <>
+                                        <label className="text-sm font-medium mt-2">Father</label>
+                                        <input type="text" name="lateBC.father" onChange={handleChangeData} value={additionalData.lateBC.father} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Mother</label>
+                                        <input type="text" name="lateBC.mother" onChange={handleChangeData} value={additionalData.lateBC.mother} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Name of Child</label>
+                                        <input type="text" name="lateBC.nameOfChild" onChange={handleChangeData} value={additionalData.lateBC.nameOfChild} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Father's Occupation</label>
+                                        <input type="text" name="lateBC.fatherOccupation" onChange={handleChangeData} value={additionalData.lateBC.fatherOccupation} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Mother's Occupation</label>
+                                        <input type="text" name="lateBC.motherOccupation" onChange={handleChangeData} value={additionalData.lateBC.motherOccupation} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Place of Birth</label>
+                                        <input type="text" name="lateBC.placeOfBirth" onChange={handleChangeData} value={additionalData.lateBC.placeOfBirth} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Date of Birth</label>
+                                        <input type="date" name="lateBC.dateOfBirth" onChange={handleChangeData} value={additionalData.lateBC.dateOfBirth} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Religion</label>
+                                        <input type="text" name="lateBC.religion" onChange={handleChangeData} value={additionalData.lateBC.religion} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+                                        <label className="text-sm font-medium mt-2">Is Married</label>
+                                        <input type="checkbox" name="lateBC.isMerried" onChange={handleChangeData} checked={additionalData.lateBC.isMerried} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
+
+
                                     </>
                                 )
                             }
