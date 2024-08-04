@@ -361,7 +361,7 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                                         <label className="text-sm font-medium mt-2">Father</label>
                                         <input type="text" name="lateBC.father" onChange={handleChangeData} value={additionalData.lateBC.father} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
 
-                                        <label className="text-sm font-medium mt-2">Mother</label>
+                                        <label className="text-sm font-medium mt-2">Mother's Maiden Name</label>
                                         <input type="text" name="lateBC.mother" onChange={handleChangeData} value={additionalData.lateBC.mother} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
 
                                         <label className="text-sm font-medium mt-2">Name of Child</label>
@@ -383,8 +383,10 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                                         <input type="text" name="lateBC.religion" onChange={handleChangeData} value={additionalData.lateBC.religion} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
 
                                         <label className="text-sm font-medium mt-2">Is Married</label>
-                                        <input type="checkbox" name="lateBC.isMerried" onChange={handleChangeData} checked={additionalData.lateBC.isMerried} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg"/>
-
+                                        <select name="lateBC.isMerried" onChange={handleChangeData} value={additionalData.lateBC.isMerried} className="p-2 px-4 border border-gray-300 rounded-md font-medium text-lg">
+                                            <option value={true}>Yes</option>
+                                            <option value={false}>No</option>
+                                        </select>
 
                                     </>
                                 )
