@@ -280,7 +280,7 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
 
     return (
         <div className="flex flex-col w-full justify-center">
-            <div className="flex flex-col p-8 w-full h-fit shadow-lg ">
+            <div className="flex flex-col p-8 w-full h-fit shadow-lg bg-gray-300 ">
                 <h3 className="font-semibold text-2xl text-gray-700">Forms</h3>
                 {
                    resident?.isBlocked && <p className="text-red-500 text-sm font-medium mt-2">This resident is blocked, requesting form is not possible.</p> 
@@ -475,7 +475,6 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                     )
                 }
             </div>
-
             <div className="flex flex-col p-8 w-full h-fit shadow-lg ">
                 <div className="overflow-y-auto mt-8">
                     <div className="flex justify-between items-center mb-8">
