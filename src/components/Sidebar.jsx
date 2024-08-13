@@ -103,12 +103,12 @@ function Sidebar() {
         </div>
         <ul className='gap-2 flex flex-col'>
             {links.map((link, index) => (
-                <li key={index} className={`ease-in-out duration-150 px-3 py-2 gap-2 rounded-md flex items-center ${location.pathname === link.path ? 'bg-white shadow-md text-black' : 'text-white hover:bg-white hover:shadow-md hover:text-black'}`}>
+                <Link to={link.path} key={index} className={`ease-in-out duration-150 px-3 py-2 gap-2 rounded-md flex items-center ${location.pathname === link.path ? 'bg-white shadow-md text-black' : 'text-white hover:bg-white hover:shadow-md hover:text-black'}`}>
                     {
                         location.pathname === link.path ? link.icon : link.iconWhite
                     }
-                    <Link to={link.path}>{link.name}</Link>
-                </li>
+                    <p >{link.name}</p>
+                </Link>
             ))}
         </ul>
     </div>  

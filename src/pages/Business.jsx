@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import toast from "react-hot-toast";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../constants/api";
 import ResidentSelector from "../components/business/ResidentSelector";
@@ -40,6 +40,7 @@ const AddBusiness = () => {
         isNew: false,
         amount: 0,
     })
+    const navigate = useNavigate()
     const [openResidentSelector, setOpenResidentSelector] = useState(false)
 
     useEffect(() => {
@@ -106,6 +107,7 @@ const AddBusiness = () => {
         try{    
             const {data} = await axios.post(`${API_URL}business/create`, body)
             console.log(data)
+            navigate(`/business/${data.data._id}`)
             toast.success(data.message)
             //TODO: reroute to business page
         } catch (error) {

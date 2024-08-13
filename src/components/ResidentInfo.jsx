@@ -79,10 +79,12 @@ const ResidentInfo = ({residentData}) => {
             const {data} = await axios.put(`${API_URL}resident/update-pfp/${residentData._id}`, formData);
             console.log(data);
             toast.success('Profile picture updated successfully');
+            setTimeout(() => {
+                window.location.reload();
+            },1000);
         } catch (error) {
             console.error(error);
         }
-    
     }
 
     useEffect(() => {

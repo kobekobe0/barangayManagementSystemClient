@@ -5,6 +5,7 @@ import ResidentFormModal from "./residents/ResidentFormModal"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import toast from "react-hot-toast"
+import WebcamCapture from "./residents/ResidentCameraModal"
 
 const withPurpose = ['BRC','BC', 'CH', 'IC']
 const withImg = ['BRC', 'SLP', 'WP', 'BC', "TODA", 'IC']
@@ -84,7 +85,8 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
     const [formDisplay, setFormDisplay] = useState('');
     const [formTypeQuery, setFormTypeQuery] = useState('')
     const [indigentHistory, setIndigentHistory] = useState([])
-
+    const [photo, setPhoto] = useState(null);
+    const [openPicture, setOpenPicture] = useState(false);
 
     const [additionalData, setAdditionalData] = useState({
         CTCNo: '',
@@ -214,6 +216,19 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
         }
     }
 
+    const handlePfpSave = async () => {
+        const formData = new FormData();
+        formData.append('image', photo);
+        formData.append('fileIsRequired', true);
+        try {
+            const {data} = await axios.put(`${API_URL}resident/update-pfp/${id}`, formData);
+            console.log(data);
+            toast.success('Profile picture updated successfully');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     useEffect(() => {
         fetchBusinesses()
         fetchForms()
@@ -311,7 +326,27 @@ const ResidentFormRequest = ({id, resident}) => { // TODO: FORM LIST
                     formType !== '' && (
                         <div className="flex w-full flex-col">
                             {
-                                withImg.includes(formType) && <p className="text-orange-500 text-sm font-medium">This form needs resident's Image. Make sure that the resident has an image before generating.</p>
+                                withImg.includes(formType) && 
+                                    <div>
+                                        <div className="flex flex-col gap-4 mb-4">
+                                            <h3 className="font-medium text-sm text-gray-600">Profile Picture</h3>
+                                            <div className="flex items-center gap-4">
+                                                {photo && <img src={URL.createObjectURL(photo)} alt="preview" />}
+                                                <button className="bg-blue-500 rounded-md p-2 hover:bg-blue-600 transition-all" onClick={() => setOpenPicture(true)}><svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 512 512"><circle cx="256" cy="272" r="64" fill="white"/><path fill="white" d="M432 144h-59c-3 0-6.72-1.94-9.62-5l-25.94-40.94a15.5 15.5 0 0 0-1.37-1.85C327.11 85.76 315 80 302 80h-92c-13 0-25.11 5.76-34.07 16.21a15.5 15.5 0 0 0-1.37 1.85l-25.94 41c-2.22 2.42-5.34 5-8.62 5v-8a16 16 0 0 0-16-16h-24a16 16 0 0 0-16 16v8h-4a48.05 48.05 0 0 0-48 48V384a48.05 48.05 0 0 0 48 48h352a48.05 48.05 0 0 0 48-48V192a48.05 48.05 0 0 0-48-48M256 368a96 96 0 1 1 96-96a96.11 96.11 0 0 1-96 96"/></svg></button>
+                                                {
+                                                    photo && (
+                                                        <button onClick={handlePfpSave} className="bg-green-500 rounded-md p-2 hover:bg-green-600 transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24"><path fill="white" d="M21 7v12q0 .825-.587 1.413T19 21H5q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h12zm-9 11q1.25 0 2.125-.875T15 15t-.875-2.125T12 12t-2.125.875T9 15t.875 2.125T12 18m-6-8h9V6H6z"/></svg></button>
+                                                    )
+                                                }
+                                                {
+                                                    openPicture && (
+                                                        <WebcamCapture setPhoto={setPhoto} onClose={()=>setOpenPicture(false)}/>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                        <p className="text-orange-500 text-sm font-medium">This form needs resident's Image. Make sure that the resident has an image before generating.</p>
+                                    </div>
                             }
                             {
                                 withLocation.includes(formType) && (

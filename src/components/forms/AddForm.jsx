@@ -135,7 +135,7 @@ const AddForm = () => {
 
         try{
             //create form in the backend, if failed do not generate document
-            const response = await axios.post(`${API_URL}form/non-resident`, dataToSend, {
+            const response = await axios.post(`${API_URL}form/create/non-resident`, dataToSend, {
                 responseType: 'arraybuffer' 
             })
             console.log(response)
