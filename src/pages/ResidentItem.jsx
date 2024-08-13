@@ -56,13 +56,10 @@ const BarangayID = ({resident, onClose}) => {
             link.href = fileURL;
             link.download = `ID_${resident?.name?.first}_${resident?.name?.last}.docx`;
             link.click();
-
+            toast.dismiss()
             toast.success('Barangay ID generated successfully')
-
-            setTimeout(() => {
-                toast.dismiss()
-            }, 1000)
         } catch (error) {
+            toast.dismiss()
             console.error(error)
             toast.error('An error occured. Please try again later')
         }

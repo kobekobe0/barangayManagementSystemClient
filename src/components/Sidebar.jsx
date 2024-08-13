@@ -83,11 +83,10 @@ function Sidebar() {
         toast.loading('Backing up...')
         try{
             const reponse = await axios.post(`${API_URL}backup`)
+            toast.dismiss()
             toast.success(reponse.data.message)
-            setTimeout(() => {
-                toast.dismiss()
-            }, 1000)
         } catch (error) {
+            toast.dismiss()
             toast.error('Failed to backup')
         }
     }

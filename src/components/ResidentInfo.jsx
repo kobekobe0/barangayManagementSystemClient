@@ -61,10 +61,14 @@ const ResidentInfo = ({residentData}) => {
 
             const {data} = await axios.put(`${API_URL}resident/update/${residentData._id}`, dataToSubmit);
             console.log(data);
+            toast.dismiss();
             toast.success('Resident updated successfully');
         } catch (error) {
+            toast.dismiss();
+            toast.error('An error occurred');
             console.error(error);
         }
+        
     }
 
     const handlePfpSave = async () => {

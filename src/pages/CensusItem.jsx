@@ -122,6 +122,8 @@ const AddModal = ({onClose}) => {
             window.open(`/census/${id}/${data.data._id}`, '_blank');
             onClose();
         } catch (error) {
+            toast.dismiss();
+            toast.error('An error occurred');
             console.error(error);
         }
     }
